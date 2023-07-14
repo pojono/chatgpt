@@ -1,0 +1,8 @@
+.idea
+node_modules
+database
+dist
+config
+
+.github
+.gitignore
