@@ -42,4 +42,4 @@ jobs:
           -o UserKnownHostsFile=/dev/null \
           -p ${{ secrets.VPS_PORT }} \
           ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_IP_ADDRESS }} \
-          'cd ~/chatgpt && docker-compose up -d -e DOCKER_TAG=${{ github.sha }} -e OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} -e TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN }}'
+          'cd ~/chatgpt && DOCKER_TAG=${{ github.sha }} OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN }} docker-compose up -d'
