@@ -1,0 +1,6 @@
+chatgpt:
+  image: pojono/chatgpt:latest
+  environment:
+    - OPENAI_API_KEY=1
+    - TELEGRAM_BOT_TOKEN=1
+  restart: always

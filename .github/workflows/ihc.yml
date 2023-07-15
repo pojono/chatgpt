@@ -25,3 +25,7 @@ jobs:
           context: .
           push: true
           tags: pojono/chatgpt:${{ github.sha }}
+
+      - name: Copy docker-compose.yml to remote VPS
+        run: |
+          sshpass -p "${{ secrets.VPS_PASSWORD }}" scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -P ${{ secrets.VPS_PORT }} -r docker-compose.yml ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_IP_ADDRESS }}:~/chatgpt/docker-compose.yml
