@@ -2,6 +2,7 @@ version: '3'
 services:
   chatgpt:
     image: pojono/chatgpt:${DOCKER_TAG}
+    container_name: chatgpt
     environment:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
