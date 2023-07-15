@@ -1,5 +1,5 @@
-import {open, RootDatabase} from 'lmdb';
-import {logWithTime} from './utils';
+import { open, RootDatabase } from 'lmdb';
+import { logWithTime } from './utils';
 
 interface ContextObject {
   conversationId?: string;
@@ -10,12 +10,14 @@ type Context = ContextObject | undefined;
 
 export class DB {
   protected _db: RootDatabase;
+
   constructor() {
     this._db = open({
       path: 'database',
       compression: true,
     });
   }
+
   getContext = (chatId: number): Promise<Context> => {
     if (this._db) {
       return this._db.get(chatId);
@@ -27,7 +29,7 @@ export class DB {
   updateContext = async (
     chatId: number,
     newContext: Pick<ContextObject, 'conversationId'> &
-      Required<Pick<ContextObject, 'parentMessageId'>>
+      Required<Pick<ContextObject, 'parentMessageId'>>,
   ) => {
     if (this._db) {
       await this._db.put(chatId, newContext);

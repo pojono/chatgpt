@@ -1,11 +1,11 @@
 import type TelegramBot from 'node-telegram-bot-api';
-import type {ChatGPT} from '../api';
-import {BotOptions} from '../types';
-import {logWithTime} from '../utils';
-import {Authenticator} from './authentication';
-import {ChatHandler} from './chat';
-import {CommandHandler} from './command';
-import {DB} from '../db';
+import type { ChatGPT } from '../api';
+import { BotOptions } from '../types';
+import { logWithTime } from '../utils';
+import { Authenticator } from './authentication';
+import { ChatHandler } from './chat';
+import { CommandHandler } from './command';
+import { DB } from '../db';
 
 class MessageHandler {
   debug: number;
@@ -22,7 +22,7 @@ class MessageHandler {
     api: ChatGPT,
     botOpts: BotOptions,
     db: DB,
-    debug = 1
+    debug = 1,
   ) {
     this.debug = debug;
     this._bot = bot;
@@ -45,14 +45,14 @@ class MessageHandler {
     if (!(await this._authenticator.authenticate(msg))) return;
 
     // Parse message.
-    const {text, command, isMentioned} = this._parseMessage(msg);
+    const { text, command, isMentioned } = this._parseMessage(msg);
     if (command != '' && command != this._opts.chatCmd) {
       // For commands except `${chatCmd}`, pass the request to commandHandler.
       await this._commandHandler.handle(
         msg,
         command,
         isMentioned,
-        this._botUsername
+        this._botUsername,
       );
     } else {
       // Handles:
@@ -80,8 +80,8 @@ class MessageHandler {
         }
       }
     }
-    return {text, command, isMentioned};
+    return { text, command, isMentioned };
   };
 }
 
-export {MessageHandler};
+export { MessageHandler };

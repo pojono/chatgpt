@@ -1,4 +1,4 @@
-import type {openai, FetchFn} from 'chatgpt';
+import type { openai, FetchFn } from 'chatgpt';
 
 export interface BotOptions {
   token: string;

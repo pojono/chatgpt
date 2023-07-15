@@ -1,7 +1,7 @@
 import type TelegramBot from 'node-telegram-bot-api';
-import type {Message} from 'node-telegram-bot-api';
-import {BotOptions} from '../types';
-import {logWithTime} from '../utils';
+import type { Message } from 'node-telegram-bot-api';
+import { BotOptions } from '../types';
+import { logWithTime } from '../utils';
 
 class Authenticator {
   debug: number;
@@ -22,11 +22,11 @@ class Authenticator {
       ) {
         logWithTime(
           '⚠️ Authentication failed for user ' +
-            `@${msg.from?.username ?? ''} (${msg.from?.id}).`
+            `@${msg.from?.username ?? ''} (${msg.from?.id}).`,
         );
         await this._bot.sendMessage(
           msg.chat.id,
-          '⛔️ Sorry, you are not my owner. I cannot chat with you or execute your command.'
+          '⛔️ Sorry, you are not my owner. I cannot chat with you or execute your command.',
         );
         return false;
       }
@@ -36,11 +36,11 @@ class Authenticator {
         this._opts.groupIds.indexOf(msg.chat.id) == -1
       ) {
         logWithTime(
-          `⚠️ Authentication failed for group ${msg.chat.title} (${msg.chat.id}).`
+          `⚠️ Authentication failed for group ${msg.chat.title} (${msg.chat.id}).`,
         );
         await this._bot.sendMessage(
           msg.chat.id,
-          "⛔️ Sorry, I'm not supposed to work here. Please remove me from the group."
+          "⛔️ Sorry, I'm not supposed to work here. Please remove me from the group.",
         );
         return false;
       }
@@ -49,4 +49,4 @@ class Authenticator {
   };
 }
 
-export {Authenticator};
+export { Authenticator };

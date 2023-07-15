@@ -1,7 +1,7 @@
 import type TelegramBot from 'node-telegram-bot-api';
-import type {ChatGPT} from '../api';
-import {BotOptions} from '../types';
-import {logWithTime} from '../utils';
+import type { ChatGPT } from '../api';
+import { BotOptions } from '../types';
+import { logWithTime } from '../utils';
 
 class CommandHandler {
   debug: number;
@@ -20,7 +20,7 @@ class CommandHandler {
     msg: TelegramBot.Message,
     command: string,
     isMentioned: boolean,
-    botUsername: string
+    botUsername: string,
   ) => {
     const userInfo = `@${msg.from?.username ?? ''} (${msg.from?.id})`;
     const chatInfo =
@@ -29,7 +29,7 @@ class CommandHandler {
         : `group ${msg.chat.title} (${msg.chat.id})`;
     if (this.debug >= 1) {
       logWithTime(
-        `👨‍💻️ User ${userInfo} issued command "${command}" in ${chatInfo} (isMentioned=${isMentioned}).`
+        `👨‍💻️ User ${userInfo} issued command "${command}" in ${chatInfo} (isMentioned=${isMentioned}).`,
       );
     }
 
@@ -48,7 +48,7 @@ class CommandHandler {
             `(When using a command in a group, make sure to include a mention after the command, like /help@${botUsername}).\n` +
             '  • /help Show help information.\n' +
             '  • /reset Reset the current chat thread and start a new one.\n' +
-            '  • /reload (admin required) Refresh the ChatGPT session.'
+            '  • /reload (admin required) Refresh the ChatGPT session.',
         );
         break;
 
@@ -57,7 +57,7 @@ class CommandHandler {
         await this._api.resetThread(msg.chat.id);
         await this._bot.sendMessage(
           msg.chat.id,
-          '🔄 The chat thread has been reset. New chat thread started.'
+          '🔄 The chat thread has been reset. New chat thread started.',
         );
         logWithTime(`🔄 Chat thread reset by ${userInfo}.`);
         break;
@@ -66,10 +66,10 @@ class CommandHandler {
         if (this._opts.userIds.indexOf(msg.from?.id ?? 0) == -1) {
           await this._bot.sendMessage(
             msg.chat.id,
-            '⛔️ Sorry, you do not have the permission to run this command.'
+            '⛔️ Sorry, you do not have the permission to run this command.',
           );
           logWithTime(
-            `⚠️ Permission denied for "${command}" from ${userInfo}.`
+            `⚠️ Permission denied for "${command}" from ${userInfo}.`,
           );
         } else {
           await this._bot.sendChatAction(msg.chat.id, 'typing');
@@ -81,11 +81,11 @@ class CommandHandler {
       default:
         await this._bot.sendMessage(
           msg.chat.id,
-          '⚠️ Unsupported command. Run /help to see the usage.'
+          '⚠️ Unsupported command. Run /help to see the usage.',
         );
         break;
     }
   };
 }
 
-export {CommandHandler};
+export { CommandHandler };

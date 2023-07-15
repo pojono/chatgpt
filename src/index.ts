@@ -1,21 +1,17 @@
 import TelegramBot from 'node-telegram-bot-api';
-import {ChatGPT} from './api';
-import {MessageHandler} from './handlers/message';
-import {loadConfig} from './utils';
-import {DB} from './db';
+import { ChatGPT } from './api';
+import { MessageHandler } from './handlers/message';
+import { loadConfig } from './utils';
+import { DB } from './db';
 
 async function main() {
-  console.log('🔮 ChatGPT Telegram Bot is starting...11');
-  console.log('TELEGRAM_BOT_TOKEN', process.env['TELEGRAM_BOT_TOKEN']);
-  console.log('OPENAI_API_KEY', process.env['OPENAI_API_KEY']);
+  console.log('🔮 ChatGPT Telegram Bot is starting...');
   const opts = loadConfig();
   const db = new DB();
 
-  // Initialize ChatGPT API.
   const api = new ChatGPT(opts.api, db);
   await api.init();
 
-  // Initialize Telegram Bot and message handler.
   const bot = new TelegramBot(opts.bot.token, {
     polling: true,
   });

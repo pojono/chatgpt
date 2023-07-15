@@ -1,23 +1,13 @@
-import type {
-  ChatGPTAPI,
-  ChatGPTUnofficialProxyAPI,
-  ChatMessage as ChatResponseV4,
-} from 'chatgpt';
-import {
-  APIOfficialOptions,
-  APIOptions,
-} from './types';
-import {logWithTime} from './utils';
-import {DB} from './db';
+import type { ChatGPTAPI, ChatMessage as ChatResponseV4 } from 'chatgpt';
+import { APIOfficialOptions, APIOptions } from './types';
+import { logWithTime } from './utils';
+import { DB } from './db';
 
 class ChatGPT {
   debug: number;
   readonly apiType: string;
   protected _opts: APIOptions;
-  protected _api:
-    | ChatGPTAPI
-    | ChatGPTUnofficialProxyAPI
-    | undefined;
+  protected _api: ChatGPTAPI | undefined;
   protected _apiOfficial: ChatGPTAPI | undefined;
   protected _timeoutMs: number | undefined;
   protected _db: DB;
@@ -32,9 +22,9 @@ class ChatGPT {
 
   init = async () => {
     if (this._opts.type == 'official') {
-      const {ChatGPTAPI} = await import('chatgpt');
+      const { ChatGPTAPI } = await import('chatgpt');
       this._apiOfficial = new ChatGPTAPI(
-        this._opts.official as APIOfficialOptions
+        this._opts.official as APIOfficialOptions,
       );
       this._api = this._apiOfficial;
       this._timeoutMs = this._opts.official?.timeoutMs;
@@ -47,7 +37,7 @@ class ChatGPT {
   sendMessage = async (
     text: string,
     chatId: number,
-    onProgress?: (res: ChatResponseV4) => void
+    onProgress?: (res: ChatResponseV4) => void,
   ) => {
     if (!this._api) return;
 
@@ -62,10 +52,10 @@ class ChatGPT {
       return;
     }
     const res: ChatResponseV4 = await this._apiOfficial.sendMessage(text, {
-        ...context,
-        onProgress,
-        timeoutMs: this._timeoutMs,
-      });
+      ...context,
+      onProgress,
+      timeoutMs: this._timeoutMs,
+    });
 
     const parentMessageId = (res as ChatResponseV4).id;
 
@@ -82,4 +72,4 @@ class ChatGPT {
   };
 }
 
-export {ChatGPT};
+export { ChatGPT };

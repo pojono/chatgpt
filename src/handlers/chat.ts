@@ -1,12 +1,12 @@
-import type {ChatMessage as ChatResponseV4} from 'chatgpt';
+import type { ChatMessage as ChatResponseV4 } from 'chatgpt';
 import _ from 'lodash';
 import type TelegramBot from 'node-telegram-bot-api';
 import telegramifyMarkdown from 'telegramify-markdown';
-import type {ChatGPT} from '../api';
-import {BotOptions} from '../types';
-import {logWithTime} from '../utils';
+import type { ChatGPT } from '../api';
+import { BotOptions } from '../types';
+import { logWithTime } from '../utils';
 import Queue from 'promise-queue';
-import {DB} from '../db';
+import { DB } from '../db';
 
 class ChatHandler {
   debug: number;
@@ -25,7 +25,7 @@ class ChatHandler {
     api: ChatGPT,
     botOpts: BotOptions,
     db: DB,
-    debug = 1
+    debug = 1,
   ) {
     this.debug = debug;
     this._bot = bot;
@@ -53,7 +53,7 @@ class ChatHandler {
       this._opts.queue ? '⌛' : '🤔',
       {
         reply_to_message_id: msg.message_id,
-      }
+      },
     );
 
     if (!this._opts.queue) {
@@ -73,7 +73,7 @@ class ChatHandler {
         {
           chat_id: chatId,
           message_id: reply.message_id,
-        }
+        },
       );
       await requestPromise;
     }
@@ -82,7 +82,7 @@ class ChatHandler {
   protected _sendToGpt = async (
     text: string,
     chatId: number,
-    originalReply: TelegramBot.Message
+    originalReply: TelegramBot.Message,
   ) => {
     let reply = originalReply;
     await this._bot.sendChatAction(chatId, 'typing');
@@ -99,8 +99,8 @@ class ChatHandler {
             await this._bot.sendChatAction(chatId, 'typing');
           },
           3000,
-          {leading: true, trailing: false}
-        )
+          { leading: true, trailing: false },
+        ),
       );
       const resText = (res as ChatResponseV4).text;
       await this._editMessage(reply, resText);
@@ -111,7 +111,7 @@ class ChatHandler {
       await this._db.clearContext(chatId);
       this._bot.sendMessage(
         chatId,
-        "⚠️ Sorry, I'm having trouble connecting to the server, please try again later."
+        "⚠️ Sorry, I'm having trouble connecting to the server, please try again later.",
       );
     }
 
@@ -123,7 +123,7 @@ class ChatHandler {
   protected _editMessage = async (
     msg: TelegramBot.Message,
     text: string,
-    needParse = true
+    needParse = true,
   ) => {
     if (text.trim() == '' || msg.text == text) {
       return msg;
@@ -156,7 +156,7 @@ class ChatHandler {
   protected _parseQueueKey = (key: string) => {
     const [chat_id, message_id] = key.split(':');
 
-    return {chat_id, message_id};
+    return { chat_id, message_id };
   };
 
   protected _updateQueue = async (chatId: number, messageId: number) => {
@@ -166,7 +166,7 @@ class ChatHandler {
     else this._n_pending--;
 
     for (const key in this._positionInQueue) {
-      const {chat_id, message_id} = this._parseQueueKey(key);
+      const { chat_id, message_id } = this._parseQueueKey(key);
       this._positionInQueue[key]--;
       this._updatePositionQueue.add(() => {
         return this._bot.editMessageText(
@@ -176,11 +176,11 @@ class ChatHandler {
           {
             chat_id,
             message_id: Number(message_id),
-          }
+          },
         );
       });
     }
   };
 }
 
-export {ChatHandler};
+export { ChatHandler };
