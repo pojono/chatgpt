@@ -28,4 +28,18 @@ jobs:
 
       - name: Copy docker-compose.yml to remote VPS
         run: |
-          sshpass -p "${{ secrets.VPS_PASSWORD }}" scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -P ${{ secrets.VPS_PORT }} -r docker-compose.yml ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_IP_ADDRESS }}:~/chatgpt/docker-compose.yml
+          sshpass -p "${{ secrets.VPS_PASSWORD }}" \
+          scp -o StrictHostKeyChecking=no \
+          -o UserKnownHostsFile=/dev/null \
+          -P ${{ secrets.VPS_PORT }} \
+          -r docker-compose.yml \
+          ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_IP_ADDRESS }}:~/chatgpt/docker-compose.yml
+
+      - name: Run docker-compose file on remote VPS
+        run: |
+          sshpass -p "${{ secrets.VPS_PASSWORD }}" \
+          ssh -o StrictHostKeyChecking=no \
+          -o UserKnownHostsFile=/dev/null \
+          -p ${{ secrets.VPS_PORT }} \
+          ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_IP_ADDRESS }} \
+          'cd ~/chatgpt && docker-compose up -d -e DOCKER_TAG=${{ github.sha }} -e OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} -e TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN }}'

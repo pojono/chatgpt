@@ -1,6 +1,8 @@
-chatgpt:
-  image: pojono/chatgpt:latest
-  environment:
-    - OPENAI_API_KEY=1
-    - TELEGRAM_BOT_TOKEN=1
-  restart: always
+version: '3'
+services:
+  chatgpt:
+    image: pojono/chatgpt:${DOCKER_TAG}
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+    restart: always
