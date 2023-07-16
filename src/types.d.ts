@@ -29,6 +29,8 @@ export interface APIOptions {
 
 export interface Config {
   debug: number;
+  version: string;
+  ownerId?: number;
   bot: BotOptions;
   api: APIOptions;
   proxy?: string;

@@ -3,6 +3,7 @@ import { ChatGPT } from './api';
 import { MessageHandler } from './handlers/message';
 import { loadConfig } from './utils';
 import { DB } from './db';
+import { start } from './lib/start';
 
 async function main() {
   console.log('🔮 ChatGPT Telegram Bot is starting...');
@@ -19,6 +20,8 @@ async function main() {
   await messageHandler.init();
 
   bot.on('message', messageHandler.handle);
+
+  await start(bot, opts);
 }
 
 main().catch((err) => {
