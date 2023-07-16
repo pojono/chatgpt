@@ -6,6 +6,7 @@ import { Authenticator } from './authentication';
 import { ChatHandler } from './chat';
 import { CommandHandler } from './command';
 import { DB } from '../db';
+import { botNames } from '../bot.names';
 
 class MessageHandler {
   debug: number;
@@ -38,6 +39,45 @@ class MessageHandler {
     logWithTime(`🤖 Bot @${this._botUsername} has started...`);
   };
 
+  removeLettersByLengthAndOffset = (
+    letters: string[],
+    length: number,
+    offset: number,
+  ): string[] => {
+    const result = [];
+    for (let i = 0; i < letters.length; i++) {
+      if (i < offset || i >= offset + length) {
+        result.push(letters[i]);
+      } else {
+        result.push('');
+      }
+    }
+    return result;
+  };
+
+  extractTextByLengthAndOffset = (
+    input: string,
+    length: number,
+    offset: number,
+  ): string => {
+    return input.slice(offset, length + offset);
+  };
+
+  isMentioned = (msg: TelegramBot.Message): boolean => {
+    const names = [
+      this._botUsername,
+      this._botUsername.toLowerCase(),
+      this._botUsername.toUpperCase(),
+      ...botNames(),
+    ];
+    for (const name of names) {
+      if (msg.text?.includes(name)) {
+        return true;
+      }
+    }
+    return false;
+  };
+
   handle = async (msg: TelegramBot.Message) => {
     if (this.debug >= 2) logWithTime(msg);
 
@@ -68,12 +108,24 @@ class MessageHandler {
     let command = '';
     if ('entities' in msg) {
       for (const entity of msg.entities ?? []) {
-        if (entity.type == 'bot_command' && entity.offset == 0) {
-          text = msg.text?.slice(entity.length).trim() ?? '';
-          command = msg.text?.slice(0, entity.length) ?? '';
-          isMentioned = regMention.test(command);
-          command = command.replace(regMention, ''); // Remove the mention.
-          break;
+        if (entity.type == 'mention') {
+          letters = this.removeLettersByLengthAndOffset(
+            letters,
+            entity.length,
+            entity.offset,
+          );
+        }
+        if (entity.type == 'bot_command') {
+          letters = this.removeLettersByLengthAndOffset(
+            letters,
+            entity.length,
+            entity.offset,
+          );
+          command = this.extractTextByLengthAndOffset(
+            msg?.text || '',
+            entity.length,
+            entity.offset,
+          );
         }
       }
     }
