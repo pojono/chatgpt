@@ -1,16 +1,9 @@
 import type { openai } from 'chatgpt';
 import config from 'config';
 import { Config, APIOfficialOptions } from './types';
+import { tryGet } from './try.get';
 
 function loadConfig(): Config {
-  function tryGet<T>(key: string): T | undefined {
-    if (!config.has(key)) {
-      return undefined;
-    } else {
-      return config.get<T>(key);
-    }
-  }
-
   const apiType = 'official';
   const apiOfficialCfg: APIOfficialOptions = {
     apiKey:
