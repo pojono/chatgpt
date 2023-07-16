@@ -7,6 +7,7 @@ import { BotOptions } from '../types';
 import { logWithTime } from '../utils';
 import Queue from 'promise-queue';
 import { DB } from '../db';
+import { randomEmoji } from '../random.emoji';
 
 class ChatHandler {
   debug: number;
@@ -50,7 +51,7 @@ class ChatHandler {
     // Send a message to the chat acknowledging receipt of their message
     const reply = await this._bot.sendMessage(
       chatId,
-      this._opts.queue ? '⌛' : '🤔',
+      this._opts.queue ? '⌛' : randomEmoji(),
       {
         reply_to_message_id: msg.message_id,
       },
@@ -69,7 +70,9 @@ class ChatHandler {
         this._n_queued;
 
       await this._bot.editMessageText(
-        this._n_queued > 0 ? `⌛: You are #${this._n_queued} in line.` : '🤔',
+        this._n_queued > 0
+          ? `⌛: You are #${this._n_queued} in line.`
+          : randomEmoji(),
         {
           chat_id: chatId,
           message_id: reply.message_id,
@@ -172,7 +175,7 @@ class ChatHandler {
         return this._bot.editMessageText(
           this._positionInQueue[key] > 0
             ? `⌛: You are #${this._positionInQueue[key]} in line.`
-            : '🤔',
+            : randomEmoji(),
           {
             chat_id,
             message_id: Number(message_id),
