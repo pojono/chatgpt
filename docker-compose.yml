@@ -8,4 +8,5 @@ services:
       - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
       - DOCKER_TAG=${DOCKER_TAG}
       - OWNER_ID=${OWNER_ID}
+      - SYSTEM_MESSAGE=${SYSTEM_MESSAGE}
     restart: always

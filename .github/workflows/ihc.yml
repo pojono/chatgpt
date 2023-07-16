@@ -47,4 +47,5 @@ jobs:
           TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN }} \
           DOCKER_TAG=${{ github.sha }} \
           OWNER_ID=${{ secrets.OWNER_ID }} \
+          SYSTEM_MESSAGE=${{ secrets.SYSTEM_MESSAGE }} \
           docker-compose up -d'
