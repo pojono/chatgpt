@@ -7,7 +7,7 @@ import { BotOptions } from '../types';
 import { logWithTime } from '../utils';
 import Queue from 'promise-queue';
 import { DB } from '../db';
-import { randomEmoji } from '../random.emoji';
+import { randomEmoji } from '../lib/random.emoji';
 
 class ChatHandler {
   debug: number;

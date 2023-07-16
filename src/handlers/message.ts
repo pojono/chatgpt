@@ -6,7 +6,11 @@ import { Authenticator } from './authentication';
 import { ChatHandler } from './chat';
 import { CommandHandler } from './command';
 import { DB } from '../db';
-import { botNames } from '../bot.names';
+import { botNames } from '../lib/bot.names';
+import {
+  extractTextByLengthAndOffset,
+  removeLettersByLengthAndOffset,
+} from '../lib/message.extractors';
 
 class MessageHandler {
   debug: number;
@@ -37,30 +41,6 @@ class MessageHandler {
   init = async () => {
     this._botUsername = (await this._bot.getMe()).username ?? '';
     logWithTime(`🤖 Bot @${this._botUsername} has started...`);
-  };
-
-  removeLettersByLengthAndOffset = (
-    letters: string[],
-    length: number,
-    offset: number,
-  ): string[] => {
-    const result = [];
-    for (let i = 0; i < letters.length; i++) {
-      if (i < offset || i >= offset + length) {
-        result.push(letters[i]);
-      } else {
-        result.push('');
-      }
-    }
-    return result;
-  };
-
-  extractTextByLengthAndOffset = (
-    input: string,
-    length: number,
-    offset: number,
-  ): string => {
-    return input.slice(offset, length + offset);
   };
 
   isMentioned = (msg: TelegramBot.Message): boolean => {
@@ -109,19 +89,19 @@ class MessageHandler {
     if ('entities' in msg) {
       for (const entity of msg.entities ?? []) {
         if (entity.type == 'mention') {
-          letters = this.removeLettersByLengthAndOffset(
+          letters = removeLettersByLengthAndOffset(
             letters,
             entity.length,
             entity.offset,
           );
         }
         if (entity.type == 'bot_command') {
-          letters = this.removeLettersByLengthAndOffset(
+          letters = removeLettersByLengthAndOffset(
             letters,
             entity.length,
             entity.offset,
           );
-          command = this.extractTextByLengthAndOffset(
+          command = extractTextByLengthAndOffset(
             msg?.text || '',
             entity.length,
             entity.offset,

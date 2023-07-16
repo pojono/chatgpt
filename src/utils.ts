@@ -1,7 +1,7 @@
 import type { openai } from 'chatgpt';
 import config from 'config';
 import { Config, APIOfficialOptions } from './types';
-import { tryGet } from './try.get';
+import { tryGet } from './lib/try.get';
 
 function loadConfig(): Config {
   const apiType = 'official';
