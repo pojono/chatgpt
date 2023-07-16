@@ -64,12 +64,9 @@ class MessageHandler {
   };
 
   protected _parseMessage = (msg: TelegramBot.Message) => {
-    let text = msg.text ?? '';
+    let letters = msg?.text?.split('') ?? [];
     let command = '';
-    let isMentioned = false;
     if ('entities' in msg) {
-      // May have bot commands.
-      const regMention = new RegExp(`@${this._botUsername}$`);
       for (const entity of msg.entities ?? []) {
         if (entity.type == 'bot_command' && entity.offset == 0) {
           text = msg.text?.slice(entity.length).trim() ?? '';
@@ -80,6 +77,15 @@ class MessageHandler {
         }
       }
     }
+
+    let isMentioned = this.isMentioned(msg);
+    if (msg.reply_to_message) {
+      if (msg.reply_to_message.from?.username === this._botUsername) {
+        isMentioned = true;
+      }
+    }
+
+    const text = letters.join('').trim();
     return { text, command, isMentioned };
   };
 }
