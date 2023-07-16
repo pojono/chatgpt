@@ -59,7 +59,7 @@ class MessageHandler {
       // - direct messages in private chats
       // - replied messages in both private chats and group chats
       // - messages that start with `chatCmd` in private chats and group chats
-      await this._chatHandler.handle(msg, text);
+      await this._chatHandler.handle(msg, text, isMentioned);
     }
   };
 

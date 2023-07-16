@@ -35,8 +35,15 @@ class ChatHandler {
     this._db = db;
   }
 
-  handle = async (msg: TelegramBot.Message, text: string) => {
+  handle = async (
+    msg: TelegramBot.Message,
+    text: string,
+    isMentioned: boolean,
+  ): Promise<void> => {
     if (!text) return;
+    if (msg.chat.type !== 'private' && !isMentioned) {
+      return;
+    }
 
     const chatId = msg.chat.id;
     if (this.debug >= 1) {
