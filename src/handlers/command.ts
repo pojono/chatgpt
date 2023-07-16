@@ -2,6 +2,7 @@ import type TelegramBot from 'node-telegram-bot-api';
 import type { ChatGPT } from '../api';
 import { BotOptions } from '../types';
 import { logWithTime } from '../utils';
+import { shutdown } from '../lib/shutdown';
 
 class CommandHandler {
   debug: number;
@@ -82,7 +83,7 @@ class CommandHandler {
         } else {
           await this._bot.sendChatAction(msg.chat.id, 'typing');
           await this._bot.sendMessage(msg.chat.id, '🔄 Restarting...');
-          process.exit(0);
+          await shutdown();
           logWithTime(`🔄 Session refreshed by ${userInfo}.`);
         }
         break;
