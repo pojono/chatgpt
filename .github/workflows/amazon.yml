@@ -1,0 +1,52 @@
+name: Docker Deployment Workflow on Amazon VPS
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Login to Docker Registry
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.AWS_DOCKER_USERNAME }}
+          password: ${{ secrets.AWS_DOCKER_PASSWORD }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          push: true
+          tags: pojono/chatgpt:${{ github.sha }}
+
+      - name: Copy docker-compose.yml to remote Amazon VPS
+        run: |
+          sshpass -p "${{ secrets.AWS_VPS_PASSWORD }}" \
+          scp -o StrictHostKeyChecking=no \
+          -o UserKnownHostsFile=/dev/null \
+          -P ${{ secrets.AWS_VPS_PORT }} \
+          -r docker-compose.yml \
+          ${{ secrets.AWS_VPS_USERNAME }}@${{ secrets.AWS_VPS_IP_ADDRESS }}:~/chatgpt/docker-compose.yml
+
+      - name: Run docker-compose file on remote Amazon VPS
+        run: |
+          sshpass -p "${{ secrets.AWS_VPS_PASSWORD }}" \
+          ssh -o StrictHostKeyChecking=no \
+          -o UserKnownHostsFile=/dev/null \
+          -p ${{ secrets.AWS_VPS_PORT }} \
+          ${{ secrets.AWS_VPS_USERNAME }}@${{ secrets.AWS_VPS_IP_ADDRESS }} \
+          'cd ~/chatgpt && \
+          OPENAI_API_KEY=${{ secrets.AWS_OPENAI_API_KEY }} \
+          TELEGRAM_BOT_TOKEN=${{ secrets.AWS_TELEGRAM_BOT_TOKEN }} \
+          DOCKER_TAG=${{ github.sha }} \
+          OWNER_ID=${{ secrets.AWS_OWNER_ID }} \
+          SYSTEM_MESSAGE=${{ secrets.AWS_SYSTEM_MESSAGE }} \
+          BOT_NAME=${{ secrets.AWS_BOT_NAME }} \
+          docker compose up -d'

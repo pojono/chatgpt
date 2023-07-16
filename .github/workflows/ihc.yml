@@ -1,4 +1,4 @@
-name: Docker Deployment Workflow
+name: Docker Deployment Workflow on IHC VPS
 
 on:
   push:
@@ -48,4 +48,5 @@ jobs:
           DOCKER_TAG=${{ github.sha }} \
           OWNER_ID=${{ secrets.OWNER_ID }} \
           SYSTEM_MESSAGE=${{ secrets.SYSTEM_MESSAGE }} \
+          BOT_NAME=${{ secrets.BOT_NAME }} \
           docker-compose up -d'

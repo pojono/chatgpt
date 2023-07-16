@@ -9,4 +9,5 @@ services:
       - DOCKER_TAG=${DOCKER_TAG}
       - OWNER_ID=${OWNER_ID}
       - SYSTEM_MESSAGE=${SYSTEM_MESSAGE}
+      - BOT_NAME=${BOT_NAME}
     restart: always
