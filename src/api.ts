@@ -4,6 +4,7 @@ import { logWithTime } from './utils';
 import { DB } from './db';
 import { SendMessageOptions } from 'chatgpt';
 import TelegramBot from 'node-telegram-bot-api';
+import { systemMessage } from './system.message';
 
 class ChatGPT {
   debug: number;
@@ -51,6 +52,7 @@ class ChatGPT {
       name: msg?.from?.first_name,
       conversationId: contextDB?.conversationId || userId.toString(),
       parentMessageId: contextDB?.parentMessageId,
+      systemMessage: systemMessage(),
     };
 
     if (!this._apiOfficial) {
