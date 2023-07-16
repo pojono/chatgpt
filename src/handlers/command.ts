@@ -38,6 +38,13 @@ class CommandHandler {
     if (msg.chat.type != 'private' && !isMentioned) return;
 
     switch (command) {
+      case '/start':
+        await this._bot.sendMessage(
+          msg.chat.id,
+          'Send me a message to start chatting! Or send /help to see more commands.',
+        );
+        break;
+
       case '/help':
         await this._bot.sendMessage(
           msg.chat.id,
@@ -64,7 +71,7 @@ class CommandHandler {
         break;
 
       case '/reload':
-        if (this._opts.userIds.indexOf(msg.from?.id ?? 0) == -1) {
+        if (msg.from?.id !== this._opts.ownerId) {
           await this._bot.sendMessage(
             msg.chat.id,
             '⛔️ Sorry, you do not have the permission to run this command.',
@@ -74,7 +81,8 @@ class CommandHandler {
           );
         } else {
           await this._bot.sendChatAction(msg.chat.id, 'typing');
-          await this._bot.sendMessage(msg.chat.id, '🔄 Session refreshed.');
+          await this._bot.sendMessage(msg.chat.id, '🔄 Restarting...');
+          process.exit(0);
           logWithTime(`🔄 Session refreshed by ${userInfo}.`);
         }
         break;

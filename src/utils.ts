@@ -25,10 +25,11 @@ function loadConfig(): Config {
   return {
     debug: tryGet<number>('debug') || 1,
     version: process.env['DOCKER_TAG'] || 'local',
-    ownerId: Number(process.env['OWNER_ID']) || tryGet<number>('ownerId'),
     bot: {
       token:
         process.env['TELEGRAM_BOT_TOKEN'] || config.get<string>('bot.token'),
+      ownerId:
+        Number(process.env['OWNER_ID']) || tryGet<number>('ownerId') || 0,
       userIds: tryGet<number[]>('bot.userIds') || [],
       groupIds: tryGet<number[]>('bot.groupIds') || [],
       chatCmd: tryGet<string>('bot.chatCmd') || '/chat',

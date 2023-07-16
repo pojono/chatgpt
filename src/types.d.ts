@@ -2,6 +2,7 @@ import type { openai, FetchFn } from 'chatgpt';
 
 export interface BotOptions {
   token: string;
+  ownerId: number;
   userIds: number[];
   groupIds: number[];
   chatCmd: string;
@@ -30,7 +31,6 @@ export interface APIOptions {
 export interface Config {
   debug: number;
   version: string;
-  ownerId?: number;
   bot: BotOptions;
   api: APIOptions;
   proxy?: string;
