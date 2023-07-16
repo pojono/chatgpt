@@ -18,9 +18,12 @@ export class DB {
     });
   }
 
-  getContext = (chatId: number): Promise<Context> => {
+  getKey = (chatId: number, userId: number) => `${chatId}:${userId}`;
+
+  getContext = (chatId: number, userId: number): Promise<Context> => {
+    const key = this.getKey(chatId, userId);
     if (this._db) {
-      return this._db.get(chatId);
+      return this._db.get(key);
     } else {
       logWithTime('DB is not initialised!');
       return Promise.reject(undefined);
@@ -28,18 +31,21 @@ export class DB {
   };
   updateContext = async (
     chatId: number,
+    userId: number,
     newContext: Pick<ContextObject, 'conversationId'> &
       Required<Pick<ContextObject, 'parentMessageId'>>,
   ) => {
+    const key = this.getKey(chatId, userId);
     if (this._db) {
-      await this._db.put(chatId, newContext);
+      await this._db.put(key, newContext);
     } else {
       logWithTime('DB is not initialised!');
     }
   };
-  clearContext = async (chatId: number) => {
+  clearContext = async (chatId: number, userId: number) => {
+    const key = this.getKey(chatId, userId);
     if (this._db) {
-      await this._db.remove(chatId);
+      await this._db.remove(key);
     } else {
       logWithTime('DB is not initialised!');
     }
