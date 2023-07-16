@@ -58,14 +58,17 @@ class ChatHandler {
     );
 
     if (!this._opts.queue) {
-      await this._sendToGpt(text, chatId, reply);
+      await this._sendToGpt(msg, text, chatId, reply);
     } else {
       // add to sequence queue due to chatGPT processes only one request at a time
       const requestPromise = this._apiRequestsQueue.add(() => {
-        return this._sendToGpt(text, chatId, reply);
+        return this._sendToGpt(msg, text, chatId, reply);
       });
-      if (this._n_pending == 0) this._n_pending++;
-      else this._n_queued++;
+      if (this._n_pending == 0) {
+        this._n_pending++;
+      } else {
+        this._n_queued++;
+      }
       this._positionInQueue[this._getQueueKey(chatId, reply.message_id)] =
         this._n_queued;
 
@@ -83,16 +86,19 @@ class ChatHandler {
   };
 
   protected _sendToGpt = async (
+    msg: TelegramBot.Message,
     text: string,
     chatId: number,
     originalReply: TelegramBot.Message,
   ) => {
+    const userId = msg.from?.id ?? 0;
     let reply = originalReply;
     await this._bot.sendChatAction(chatId, 'typing');
 
     // Send message to ChatGPT
     try {
       const res = await this._api.sendMessage(
+        msg,
         text,
         chatId,
         _.throttle(
@@ -111,7 +117,7 @@ class ChatHandler {
       if (this.debug >= 1) logWithTime(`📨 Response:\n${resText}`);
     } catch (err) {
       logWithTime('⛔️ ChatGPT API error:', (err as Error).message);
-      await this._db.clearContext(chatId);
+      await this._db.clearContext(chatId, userId);
       this._bot.sendMessage(
         chatId,
         "⚠️ Sorry, I'm having trouble connecting to the server, please try again later.",

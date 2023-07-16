@@ -2,6 +2,8 @@ import type { ChatGPTAPI, ChatMessage as ChatResponseV4 } from 'chatgpt';
 import { APIOfficialOptions, APIOptions } from './types';
 import { logWithTime } from './utils';
 import { DB } from './db';
+import { SendMessageOptions } from 'chatgpt';
+import TelegramBot from 'node-telegram-bot-api';
 
 class ChatGPT {
   debug: number;
@@ -35,13 +37,15 @@ class ChatGPT {
   };
 
   sendMessage = async (
+    msg: TelegramBot.Message,
     text: string,
     chatId: number,
     onProgress?: (res: ChatResponseV4) => void,
   ) => {
+    const userId = msg.from?.id ?? 0;
     if (!this._api) return;
 
-    const contextDB = await this._db.getContext(chatId);
+    const contextDB = await this._db.getContext(chatId, userId);
 
     const context = {
       conversationId: contextDB?.conversationId,
@@ -59,7 +63,7 @@ class ChatGPT {
 
     const parentMessageId = (res as ChatResponseV4).id;
 
-    await this._db.updateContext(chatId, {
+    await this._db.updateContext(chatId, userId, {
       conversationId: res.conversationId,
       parentMessageId,
     });
@@ -67,8 +71,8 @@ class ChatGPT {
     return res;
   };
 
-  resetThread = async (chatId: number) => {
-    await this._db.clearContext(chatId);
+  resetThread = async (chatId: number, userId: number) => {
+    await this._db.clearContext(chatId, userId);
   };
 }
 
