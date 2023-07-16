@@ -47,8 +47,9 @@ class ChatGPT {
 
     const contextDB = await this._db.getContext(chatId, userId);
 
-    const context = {
-      conversationId: contextDB?.conversationId,
+    const context: SendMessageOptions = {
+      name: msg?.from?.first_name,
+      conversationId: contextDB?.conversationId || userId.toString(),
       parentMessageId: contextDB?.parentMessageId,
     };
 
