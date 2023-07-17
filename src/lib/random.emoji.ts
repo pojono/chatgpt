@@ -3,7 +3,28 @@ function getRandomElement<T>(array: T[]): T {
   return array[randomIndex];
 }
 
-const emojis = ['🥰', '😎', '😇', '😏'];
+const emojis = [
+  '🥰',
+  '😎',
+  '😇',
+  '😏',
+  '🐠',
+  '🦭',
+  '🍀',
+  '🦢',
+  '🦙',
+  '🐱',
+  '⛅',
+  '🦋',
+  '🕊',
+  '🐥',
+  '👩‍💻',
+  '🌺',
+  '💃',
+  '💫',
+  '🤭',
+  '🤗',
+];
 
 export function randomEmoji(): string {
   return getRandomElement<string>(emojis);
