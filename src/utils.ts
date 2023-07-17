@@ -29,7 +29,7 @@ function loadConfig(): Config {
       token:
         process.env['TELEGRAM_BOT_TOKEN'] || config.get<string>('bot.token'),
       ownerId:
-        Number(process.env['OWNER_ID']) || tryGet<number>('ownerId') || 0,
+        Number(process.env['OWNER_ID']) || tryGet<number>('bot.ownerId') || 0,
       userIds: tryGet<number[]>('bot.userIds') || [],
       groupIds: tryGet<number[]>('bot.groupIds') || [],
       chatCmd: tryGet<string>('bot.chatCmd') || '/chat',
