@@ -102,30 +102,27 @@ class ChatHandler {
     let reply = originalReply;
     await this._bot.sendChatAction(chatId, 'typing');
 
-    // Send message to ChatGPT
-    try {
-      const res = await this._api.sendMessage(
-        msg,
-        text,
-        chatId,
-        _.throttle(
-          async (partialResponse: ChatResponseV4) => {
-            const resText = (partialResponse as ChatResponseV4).text;
-            reply = await this._editMessage(reply, resText);
-            await this._bot.sendChatAction(chatId, 'typing');
-          },
-          3000,
-          { leading: true, trailing: false },
-        ),
-      );
-      const resText = (res as ChatResponseV4).text;
-      await this._editMessage(reply, resText);
+    const ON_PROGRESS_WAIT_MS = 1000;
 
-      if (this.debug >= 1) logWithTime(`📨 Response:\n${resText}`);
+    const onProgress = _.throttle(
+      async (partialResponse: ChatResponseV4) => {
+        reply = await this._editMessage(reply, partialResponse.text);
+        await this._bot.sendChatAction(chatId, 'typing');
+      },
+      ON_PROGRESS_WAIT_MS,
+      { leading: true, trailing: false },
+    );
+
+    // Send a message to ChatGPT
+    try {
+      const res = await this._api.sendMessage(msg, text, chatId, onProgress);
+      await this._editMessage(reply, res.text);
+
+      if (this.debug >= 1) logWithTime(`📨 Response:\n${res.text}`);
     } catch (err) {
       logWithTime('⛔️ ChatGPT API error:', (err as Error).message);
       await this._db.clearContext(chatId, userId);
-      this._bot.sendMessage(
+      await this._bot.sendMessage(
         chatId,
         "⚠️ Sorry, I'm having trouble connecting to the server, please try again later.",
       );

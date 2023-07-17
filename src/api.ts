@@ -14,7 +14,7 @@ const { ChatGPTAPI } = await import('chatgpt');
 class ChatGPT {
   debug: number;
   protected _opts: APIOptions;
-  protected _apiOfficial: ChatGPTAPIType;
+  protected _openAI: ChatGPTAPIType;
   protected _timeoutMs: number | undefined;
   protected _db: DB;
 
@@ -23,9 +23,7 @@ class ChatGPT {
     this._opts = apiOpts;
     this._timeoutMs = undefined;
     this._db = db;
-    this._apiOfficial = new ChatGPTAPI(
-      this._opts.official as APIOfficialOptions,
-    );
+    this._openAI = new ChatGPTAPI(this._opts.official as APIOfficialOptions);
     this._timeoutMs = this._opts.official?.timeoutMs;
   }
 
@@ -50,7 +48,7 @@ class ChatGPT {
       systemMessage: systemMessage(),
     };
 
-    const res: ChatResponseV4 = await this._apiOfficial.sendMessage(text, {
+    const res: ChatResponseV4 = await this._openAI.sendMessage(text, {
       ...context,
       onProgress,
       timeoutMs: this._timeoutMs,
