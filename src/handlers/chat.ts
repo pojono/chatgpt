@@ -102,7 +102,7 @@ class ChatHandler {
     let reply = originalReply;
     await this._bot.sendChatAction(chatId, 'typing');
 
-    const ON_PROGRESS_WAIT_MS = 1000;
+    const ON_PROGRESS_WAIT_MS = 3000;
 
     const onProgress = _.throttle(
       async (partialResponse: ChatResponseV4) => {
