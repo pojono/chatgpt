@@ -15,7 +15,6 @@ export interface APIOfficialOptions {
   completionParams?: Partial<
     Omit<openai.CreateChatCompletionRequest, 'messages' | 'n'>
   >;
-  systemMessage?: string;
   maxModelTokens?: number;
   maxResponseTokens?: number;
   timeoutMs?: number;
