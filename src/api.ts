@@ -2,12 +2,13 @@ import type {
   ChatGPTAPI as ChatGPTAPIType,
   ChatMessage as ChatResponseV4,
 } from 'chatgpt';
+import { SendMessageOptions } from 'chatgpt';
 import { APIOfficialOptions, APIOptions } from './types';
 import { logWithTime } from './utils';
 import { DB } from './db';
-import { SendMessageOptions } from 'chatgpt';
 import TelegramBot from 'node-telegram-bot-api';
 import { systemMessage } from './lib/system.message';
+import { getUserName } from './lib/get.user.name';
 
 const { ChatGPTAPI } = await import('chatgpt');
 
@@ -42,7 +43,7 @@ class ChatGPT {
     const contextDB = await this._db.getContext(chatId, userId);
 
     const context: SendMessageOptions = {
-      name: msg?.from?.first_name,
+      name: getUserName(msg),
       conversationId: contextDB?.conversationId || userId.toString(),
       parentMessageId: contextDB?.parentMessageId,
       systemMessage: systemMessage(),
