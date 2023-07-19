@@ -14,7 +14,6 @@ module.export = {
       "apiKey": process.env['OPENAI_API_KEY'],
       "apiBaseUrl": "",
       "completionParams": {},
-      "systemMessage": "",
       "maxModelTokens": 0, // set to 0 to use default
       "maxResponseTokens": 0, // set to 0 to use default
       "timeoutMs": 60000 // set to 0 to disable
