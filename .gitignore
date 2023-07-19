@@ -3,3 +3,6 @@ node_modules
 config/local.cjs
 database
 dist
+
+prompt/*.txt
+!prompt/default.txt
