@@ -7,7 +7,6 @@ import { APIOfficialOptions, APIOptions } from './types';
 import { logWithTime } from './utils';
 import { DB } from './db';
 import TelegramBot from 'node-telegram-bot-api';
-import { systemMessage } from './lib/system.message';
 import { getUserName } from './lib/get.user.name';
 
 const { ChatGPTAPI } = await import('chatgpt');
@@ -18,12 +17,14 @@ class ChatGPT {
   protected _openAI: ChatGPTAPIType;
   protected _timeoutMs: number | undefined;
   protected _db: DB;
+  protected _prompt: string;
 
-  constructor(apiOpts: APIOptions, db: DB, debug = 1) {
+  constructor(apiOpts: APIOptions, db: DB, prompt: string, debug = 1) {
     this.debug = debug;
     this._opts = apiOpts;
     this._timeoutMs = undefined;
     this._db = db;
+    this._prompt = prompt;
     this._openAI = new ChatGPTAPI(this._opts.official as APIOfficialOptions);
     this._timeoutMs = this._opts.official?.timeoutMs;
   }
@@ -46,7 +47,7 @@ class ChatGPT {
       name: getUserName(msg),
       conversationId: contextDB?.conversationId || userId.toString(),
       parentMessageId: contextDB?.parentMessageId,
-      systemMessage: systemMessage(),
+      systemMessage: this._prompt,
     };
 
     const res: ChatResponseV4 = await this._openAI.sendMessage(text, {
@@ -67,6 +68,14 @@ class ChatGPT {
 
   resetThread = async (chatId: number, userId: number) => {
     await this._db.clearContext(chatId, userId);
+  };
+
+  resetAllThreads = async () => {
+    await this._db.clearAllContexts();
+  };
+
+  updateSystemMessage = async (message: string) => {
+    this._prompt = message;
   };
 }
 

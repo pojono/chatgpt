@@ -3,18 +3,27 @@ import type { ChatGPT } from '../api';
 import { BotOptions } from '../types';
 import { logWithTime } from '../utils';
 import { shutdown } from '../lib/shutdown';
+import { FileData } from '../lib/read.files';
 
 class CommandHandler {
   debug: number;
   protected _opts: BotOptions;
   protected _bot: TelegramBot;
   protected _api: ChatGPT;
+  protected _prompts: FileData;
 
-  constructor(bot: TelegramBot, api: ChatGPT, botOpts: BotOptions, debug = 1) {
+  constructor(
+    bot: TelegramBot,
+    api: ChatGPT,
+    botOpts: BotOptions,
+    prompts: FileData,
+    debug = 1,
+  ) {
     this.debug = debug;
     this._bot = bot;
     this._api = api;
     this._opts = botOpts;
+    this._prompts = prompts;
   }
 
   handle = async (
@@ -35,7 +44,10 @@ class CommandHandler {
       );
     }
 
-    // Ignore commands without mention in groups.
+    const commandArgs = msg?.text?.split(' ');
+    const firstArg = commandArgs?.[1];
+
+    // Ignore commands without a mention in groups.
     if (msg.chat.type != 'private' && !isMentioned) return;
 
     switch (command) {
@@ -69,6 +81,39 @@ class CommandHandler {
           '🔄 The chat thread has been reset. New chat thread started.',
         );
         logWithTime(`🔄 Chat thread reset by ${userInfo}.`);
+        break;
+
+      case '/mode':
+        await this._bot.sendChatAction(msg.chat.id, 'typing');
+        await this._bot.sendMessage(
+          msg.chat.id,
+          Object.keys(this._prompts)
+            .map((key) => `/set ${key}`)
+            .join('\n') || 'No chat modes found.',
+        );
+        logWithTime(`🔄 Chat modes were sent to ${userInfo}.`);
+        break;
+
+      case '/set':
+        await this._bot.sendChatAction(msg.chat.id, 'typing');
+        // eslint-disable-next-line no-case-declarations
+        const mode = firstArg ?? '';
+        if (mode in this._prompts) {
+          await this._api.updateSystemMessage(this._prompts[mode]);
+          await this._api.resetAllThreads();
+
+          await this._bot.sendMessage(
+            msg.chat.id,
+            `🔄 Chat mode has been updated to "${mode}".`,
+          );
+          logWithTime(`🔄 Chat mode has been updated to "${mode}".`);
+        } else {
+          await this._bot.sendMessage(
+            msg.chat.id,
+            `🔄 Chat mode "${mode}" is not found.`,
+          );
+          logWithTime(`🔄 Chat mode "${mode}" is not found.`);
+        }
         break;
 
       case '/reload':
