@@ -1,4 +1,4 @@
-module.export = {
+module.exports = {
   "debug": 1, // debug level: 0 - no debug, 1 - debug, 2 - verbose debug
   "bot": {
     "token": process.env['TELEGRAM_BOT_TOKEN'],
