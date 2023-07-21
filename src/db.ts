@@ -50,4 +50,11 @@ export class DB {
       logWithTime('DB is not initialised!');
     }
   };
+  clearAllContexts = async () => {
+    if (this._db) {
+      await this._db.clearAsync();
+    } else {
+      logWithTime('DB is not initialised!');
+    }
+  };
 }

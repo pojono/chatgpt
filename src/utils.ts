@@ -14,7 +14,6 @@ function loadConfig(): Config {
       tryGet<
         Partial<Omit<openai.CreateChatCompletionRequest, 'messages' | 'n'>>
       >('api.official.completionParams') || undefined,
-    systemMessage: tryGet<string>('api.official.systemMessage') || undefined,
     maxModelTokens: tryGet<number>('api.official.maxModelTokens') || undefined,
     maxResponseTokens:
       tryGet<number>('api.official.maxResponseTokens') || undefined,

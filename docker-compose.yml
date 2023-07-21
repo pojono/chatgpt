@@ -11,3 +11,5 @@ services:
       - SYSTEM_MESSAGE=${SYSTEM_MESSAGE}
       - BOT_NAME=${BOT_NAME}
     restart: always
+    volumes:
+      - ./prompt:/prompt

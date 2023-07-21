@@ -11,6 +11,7 @@ import {
   extractTextByLengthAndOffset,
   removeLettersByLengthAndOffset,
 } from '../lib/message.extractors';
+import { FileData } from '../lib/read.files';
 
 class MessageHandler {
   debug: number;
@@ -27,6 +28,7 @@ class MessageHandler {
     api: ChatGPT,
     botOpts: BotOptions,
     db: DB,
+    prompts: FileData,
     debug = 1,
   ) {
     this.debug = debug;
@@ -34,7 +36,13 @@ class MessageHandler {
     this._api = api;
     this._opts = botOpts;
     this._authenticator = new Authenticator(bot, botOpts, debug);
-    this._commandHandler = new CommandHandler(bot, api, botOpts, debug);
+    this._commandHandler = new CommandHandler(
+      bot,
+      api,
+      botOpts,
+      prompts,
+      debug,
+    );
     this._chatHandler = new ChatHandler(bot, api, botOpts, db, debug);
   }
 
