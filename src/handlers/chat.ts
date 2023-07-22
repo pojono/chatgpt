@@ -151,7 +151,7 @@ class ChatHandler {
       // type of res is boolean | Message
       if (typeof res === 'object') {
         // return a Message type instance if res is a Message type
-        return res as TelegramBot.Message;
+        return res;
       } else {
         // return the original message if res is a boolean type
         return msg;
@@ -181,7 +181,7 @@ class ChatHandler {
     for (const key in this._positionInQueue) {
       const { chat_id, message_id } = this._parseQueueKey(key);
       this._positionInQueue[key]--;
-      this._updatePositionQueue.add(() => {
+      await this._updatePositionQueue.add(async () => {
         return this._bot.editMessageText(
           this._positionInQueue[key] > 0
             ? `⌛: You are #${this._positionInQueue[key]} in line.`
