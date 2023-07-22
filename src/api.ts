@@ -25,8 +25,8 @@ class ChatGPT {
     this._timeoutMs = undefined;
     this._db = db;
     this._prompt = prompt;
-    this._openAI = new ChatGPTAPI(this._opts.official as APIOfficialOptions);
-    this._timeoutMs = this._opts.official?.timeoutMs;
+    this._openAI = new ChatGPTAPI(this._opts.official);
+    this._timeoutMs = this._opts.official.timeoutMs;
   }
 
   init = async () => {

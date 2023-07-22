@@ -1,4 +1,5 @@
 import { open, RootDatabase } from 'lmdb';
+import { logWithTime } from './utils.js';
 
 interface ContextObject {
   conversationId?: string;
