@@ -1,5 +1,5 @@
 export function transliterate(input: string): string {
-  const cyrillicToLatinMap: { [key: string]: string } = {
+  const cyrillicToLatinMap: Record<string, string> = {
     а: 'a',
     б: 'b',
     в: 'v',
@@ -68,9 +68,7 @@ export function transliterate(input: string): string {
     Я: 'Ya',
   };
 
-  const transliteratedString = input.replace(/[\u0400-\u04FF]/g, (char) => {
+  return input.replace(/[\u0400-\u04FF]/g, (char) => {
     return cyrillicToLatinMap[char] || char;
   });
-
-  return transliteratedString;
 }

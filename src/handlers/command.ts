@@ -44,7 +44,7 @@ class CommandHandler {
       );
     }
 
-    const commandArgs = msg?.text?.split(' ');
+    const commandArgs = msg.text?.split(' ');
     const firstArg = commandArgs?.[1];
 
     // Ignore commands without a mention in groups.

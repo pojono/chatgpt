@@ -92,7 +92,7 @@ class MessageHandler {
   };
 
   protected _parseMessage = (msg: TelegramBot.Message) => {
-    let letters = msg?.text?.split('') ?? [];
+    let letters = msg.text?.split('') ?? [];
     let command = '';
     if ('entities' in msg) {
       for (const entity of msg.entities ?? []) {
@@ -110,7 +110,7 @@ class MessageHandler {
             entity.offset,
           );
           command = extractTextByLengthAndOffset(
-            msg?.text || '',
+            msg.text ?? '',
             entity.length,
             entity.offset,
           );
