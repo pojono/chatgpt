@@ -3,11 +3,11 @@ import type {
   ChatMessage as ChatResponseV4,
 } from 'chatgpt';
 import { SendMessageOptions } from 'chatgpt';
-import { APIOfficialOptions, APIOptions } from './types';
-import { logWithTime } from './utils';
-import { DB } from './db';
+import { APIOptions } from './types.d.js';
+import { logWithTime } from './utils.js';
+import { DB } from './db.js';
 import TelegramBot from 'node-telegram-bot-api';
-import { getUserName } from './lib/get.user.name';
+import { getUserName } from './lib/get.user.name.js';
 
 const { ChatGPTAPI } = await import('chatgpt');
 

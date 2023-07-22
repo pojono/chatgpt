@@ -1,17 +1,17 @@
 import type TelegramBot from 'node-telegram-bot-api';
-import type { ChatGPT } from '../api';
-import { BotOptions } from '../types';
-import { logWithTime } from '../utils';
-import { Authenticator } from './authentication';
-import { ChatHandler } from './chat';
-import { CommandHandler } from './command';
-import { DB } from '../db';
-import { botNames } from '../lib/bot.names';
+import type { ChatGPT } from '../api.js';
+import { BotOptions } from '../types.js';
+import { logWithTime } from '../utils.js';
+import { Authenticator } from './authentication.js';
+import { ChatHandler } from './chat.js';
+import { CommandHandler } from './command.js';
+import { DB } from '../db.js';
+import { botNames } from '../lib/bot.names.js';
 import {
   extractTextByLengthAndOffset,
   removeLettersByLengthAndOffset,
-} from '../lib/message.extractors';
-import { FileData } from '../lib/read.files';
+} from '../lib/message.extractors.js';
+import { FileData } from '../lib/read.files.js';
 
 class MessageHandler {
   debug: number;

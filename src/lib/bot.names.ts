@@ -1,4 +1,4 @@
-import { tryGet } from './try.get';
+import { tryGet } from './try.get.js';
 
 export function botNames(): string[] {
   const env = process.env['BOT_NAME'];

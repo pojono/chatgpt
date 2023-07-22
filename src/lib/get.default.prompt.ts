@@ -1,4 +1,4 @@
-import { FileData } from './read.files';
+import { FileData } from './read.files.js';
 
 export function getDefaultPrompt(prompts: FileData): string {
   return 'default' in prompts

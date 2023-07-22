@@ -1,4 +1,4 @@
-import { FileData, readFiles } from './read.files';
+import { FileData, readFiles } from './read.files.js';
 import { fileURLToPath } from 'url';
 import path from 'path';
 

@@ -1,5 +1,5 @@
 import TelegramBot from 'node-telegram-bot-api';
-import { Config } from '../types';
+import { Config } from '../types.js';
 
 export async function start(bot: TelegramBot, options: Config): Promise<void> {
   await bot.sendMessage(

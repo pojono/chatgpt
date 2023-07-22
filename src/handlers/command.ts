@@ -1,9 +1,9 @@
 import type TelegramBot from 'node-telegram-bot-api';
-import type { ChatGPT } from '../api';
-import { BotOptions } from '../types';
-import { logWithTime } from '../utils';
-import { shutdown } from '../lib/shutdown';
-import { FileData } from '../lib/read.files';
+import type { ChatGPT } from '../api.js';
+import { BotOptions } from '../types.js';
+import { logWithTime } from '../utils.js';
+import { shutdown } from '../lib/shutdown.js';
+import { FileData } from '../lib/read.files.js';
 
 class CommandHandler {
   debug: number;

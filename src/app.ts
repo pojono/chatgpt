@@ -1,11 +1,11 @@
 import TelegramBot from 'node-telegram-bot-api';
-import { ChatGPT } from './api';
-import { MessageHandler } from './handlers/message';
-import { loadConfig } from './utils';
-import { DB } from './db';
-import { start } from './lib/start';
-import { getPrompts } from './lib/get.prompts';
-import { getDefaultPrompt } from './lib/get.default.prompt';
+import { ChatGPT } from './api.js';
+import { MessageHandler } from './handlers/message.js';
+import { loadConfig } from './utils.js';
+import { start } from './lib/start.js';
+import { getPrompts } from './lib/get.prompts.js';
+import { getDefaultPrompt } from './lib/get.default.prompt.js';
+import { DB } from './db.js';
 
 async function main() {
   console.log('🔮 ChatGPT Telegram Bot is starting...');

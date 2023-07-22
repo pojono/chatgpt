@@ -1,7 +1,7 @@
 import type TelegramBot from 'node-telegram-bot-api';
 import type { Message } from 'node-telegram-bot-api';
-import { BotOptions } from '../types';
-import { logWithTime } from '../utils';
+import { BotOptions } from '../types.js';
+import { logWithTime } from '../utils.js';
 
 class Authenticator {
   debug: number;

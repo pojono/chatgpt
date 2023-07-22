@@ -2,12 +2,12 @@ import type { ChatMessage as ChatResponseV4 } from 'chatgpt';
 import _ from 'lodash';
 import type TelegramBot from 'node-telegram-bot-api';
 import telegramifyMarkdown from 'telegramify-markdown';
-import type { ChatGPT } from '../api';
-import { BotOptions } from '../types';
-import { logWithTime } from '../utils';
+import type { ChatGPT } from '../api.js';
+import { BotOptions } from '../types.js';
+import { logWithTime } from '../utils.js';
 import Queue from 'promise-queue';
-import { DB } from '../db';
-import { randomEmoji } from '../lib/random.emoji';
+import { DB } from '../db.js';
+import { randomEmoji } from '../lib/random.emoji.js';
 
 class ChatHandler {
   debug: number;
