@@ -66,17 +66,17 @@ class MessageHandler {
     return false;
   };
 
-  handle = async (msg: TelegramBot.Message) => {
+  handle = (msg: TelegramBot.Message) => {
     if (this.debug >= 2) logWithTime(msg);
 
     // Authentication.
-    if (!(await this._authenticator.authenticate(msg))) return;
+    if (!this._authenticator.authenticate(msg)) return;
 
     // Parse message.
     const { text, command, isMentioned } = this._parseMessage(msg);
     if (command != '' && command != this._opts.chatCmd) {
       // For commands except `${chatCmd}`, pass the request to commandHandler.
-      await this._commandHandler.handle(
+      void this._commandHandler.handle(
         msg,
         command,
         isMentioned,
@@ -87,7 +87,7 @@ class MessageHandler {
       // - direct messages in private chats
       // - replied messages in both private chats and group chats
       // - messages that start with `chatCmd` in private chats and group chats
-      await this._chatHandler.handle(msg, text, isMentioned);
+      void this._chatHandler.handle(msg, text, isMentioned);
     }
   };
 

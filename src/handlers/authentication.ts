@@ -14,7 +14,7 @@ class Authenticator {
     this._opts = botOpts;
   }
 
-  authenticate = async (msg: Message) => {
+  authenticate = (msg: Message) => {
     if (msg.chat.type === 'private') {
       if (
         this._opts.userIds.length !== 0 &&
@@ -24,7 +24,7 @@ class Authenticator {
           '⚠️ Authentication failed for user ' +
             `@${msg.from?.username ?? ''} (${msg.from?.id}).`,
         );
-        await this._bot.sendMessage(
+        void this._bot.sendMessage(
           msg.chat.id,
           '⛔️ Sorry, you are not my owner. I cannot chat with you or execute your command.',
         );
@@ -38,7 +38,7 @@ class Authenticator {
         logWithTime(
           `⚠️ Authentication failed for group ${msg.chat.title} (${msg.chat.id}).`,
         );
-        await this._bot.sendMessage(
+        void this._bot.sendMessage(
           msg.chat.id,
           "⛔️ Sorry, I'm not supposed to work here. Please remove me from the group.",
         );
