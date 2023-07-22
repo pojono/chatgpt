@@ -2,13 +2,12 @@ import type { openai } from 'chatgpt';
 import config from 'config';
 import { Config, APIOfficialOptions } from './types.js';
 import { tryGet } from './lib/try.get.js';
+import TelegramBot from 'node-telegram-bot-api';
 
 function loadConfig(): Config {
-  const apiType = 'official';
   const apiOfficialCfg: APIOfficialOptions = {
     apiKey:
-      process.env['OPENAI_API_KEY'] ||
-      config.get<string>('api.official.apiKey'),
+      process.env.OPENAI_API_KEY || config.get<string>('api.official.apiKey'),
     apiBaseUrl: tryGet<string>('api.official.apiBaseUrl') || undefined,
     completionParams:
       tryGet<
@@ -23,26 +22,23 @@ function loadConfig(): Config {
 
   return {
     debug: tryGet<number>('debug') || 1,
-    version: process.env['DOCKER_TAG'] || 'local',
+    version: process.env.DOCKER_TAG || 'local',
     bot: {
-      token:
-        process.env['TELEGRAM_BOT_TOKEN'] || config.get<string>('bot.token'),
+      token: process.env.TELEGRAM_BOT_TOKEN || config.get<string>('bot.token'),
       ownerId:
-        Number(process.env['OWNER_ID']) || tryGet<number>('bot.ownerId') || 0,
+        Number(process.env.OWNER_ID) || tryGet<number>('bot.ownerId') || 0,
       userIds: tryGet<number[]>('bot.userIds') || [],
       groupIds: tryGet<number[]>('bot.groupIds') || [],
       chatCmd: tryGet<string>('bot.chatCmd') || '/chat',
       queue: tryGet<boolean>('bot.queue') ?? true,
     },
     api: {
-      type: apiType,
       official: apiOfficialCfg,
     },
   };
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function logWithTime(...args: any[]) {
+function logWithTime(...args: string[] | TelegramBot.Message[]) {
   console.log(new Date().toLocaleString(), ...args);
 }
 

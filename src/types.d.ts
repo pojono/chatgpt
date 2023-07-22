@@ -23,7 +23,6 @@ export interface APIOfficialOptions {
 }
 
 export interface APIOptions {
-  type: 'official' | string;
   official: APIOfficialOptions;
 }
 
