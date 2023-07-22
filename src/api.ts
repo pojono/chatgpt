@@ -41,7 +41,7 @@ class ChatGPT {
   ): Promise<ChatResponseV4> => {
     const userId = msg.from?.id ?? 0;
 
-    const contextDB = await this._db.getContext(chatId, userId);
+    const contextDB = this._db.getContext(chatId, userId);
 
     const context: SendMessageOptions = {
       name: getUserName(msg),
