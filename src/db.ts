@@ -11,7 +11,7 @@ export class DB {
   protected _db: RootDatabase;
 
   constructor() {
-    this._db = open({
+    this._db = open<Context, string>({
       path: 'database',
       compression: true,
     });
@@ -19,9 +19,9 @@ export class DB {
 
   getKey = (chatId: number, userId: number) => `${chatId}:${userId}`;
 
-  getContext = (chatId: number, userId: number): Promise<Context> => {
+  getContext = (chatId: number, userId: number): Context => {
     const key = this.getKey(chatId, userId);
-    return this._db.get(key);
+    return this._db.get(key) as Context;
   };
   updateContext = async (
     chatId: number,
