@@ -17,8 +17,8 @@ class Authenticator {
   authenticate = async (msg: Message) => {
     if (msg.chat.type === 'private') {
       if (
-        this._opts.userIds.length != 0 &&
-        this._opts.userIds.indexOf(msg.chat.id) == -1
+        this._opts.userIds.length !== 0 &&
+        !this._opts.userIds.includes(msg.chat.id)
       ) {
         logWithTime(
           '⚠️ Authentication failed for user ' +
@@ -32,8 +32,8 @@ class Authenticator {
       }
     } else {
       if (
-        this._opts.groupIds.length != 0 &&
-        this._opts.groupIds.indexOf(msg.chat.id) == -1
+        this._opts.groupIds.length !== 0 &&
+        !this._opts.groupIds.includes(msg.chat.id)
       ) {
         logWithTime(
           `⚠️ Authentication failed for group ${msg.chat.title} (${msg.chat.id}).`,
