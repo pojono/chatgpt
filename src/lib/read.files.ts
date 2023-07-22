@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 
-export type FileData = { [key: string]: string };
+export type FileData = Record<string, string>;
 
 export function readFiles(folderPath: string): FileData {
   try {
