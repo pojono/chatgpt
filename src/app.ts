@@ -15,7 +15,7 @@ async function main() {
   const db = new DB();
 
   const api = new ChatGPT(opts.api, db, getDefaultPrompt(prompts), opts.debug);
-  await api.init();
+  api.init();
 
   const bot = new TelegramBot(opts.bot.token, {
     polling: true,

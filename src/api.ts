@@ -29,7 +29,7 @@ class ChatGPT {
     this._timeoutMs = this._opts.official.timeoutMs;
   }
 
-  init = async () => {
+  init = () => {
     logWithTime('🔮 ChatGPT API has started...');
   };
 
@@ -74,7 +74,7 @@ class ChatGPT {
     await this._db.clearAllContexts();
   };
 
-  updateSystemMessage = async (message: string) => {
+  updateSystemMessage = (message: string) => {
     this._prompt = message;
   };
 }
