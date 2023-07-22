@@ -74,7 +74,7 @@ class ChatGPT {
     await this._db.clearAllContexts();
   };
 
-  updateSystemMessage = (message: string) => {
+  updateSystemMessage = (message: string): void => {
     this._prompt = message;
   };
 }

@@ -99,7 +99,7 @@ class CommandHandler {
         // eslint-disable-next-line no-case-declarations
         const mode = firstArg ?? '';
         if (mode in this._prompts) {
-          await this._api.updateSystemMessage(this._prompts[mode]);
+          this._api.updateSystemMessage(this._prompts[mode]);
           await this._api.resetAllThreads();
 
           await this._bot.sendMessage(
