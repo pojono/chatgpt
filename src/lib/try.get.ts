@@ -1,9 +1,12 @@
 import config from 'config';
 
 export function tryGet<T>(key: string): T | undefined {
-  if (!config.has(key)) {
+  const hasValue = config.has(key);
+  if (!hasValue) {
     return undefined;
   } else {
-    return config.get<T>(key);
+    const value = config.get<T>(key);
+    const isDefined = Boolean(value);
+    return isDefined ? value : undefined;
   }
 }
