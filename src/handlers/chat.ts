@@ -17,7 +17,7 @@ class ChatHandler {
   protected _n_queued = 0;
   protected _n_pending = 0;
   protected _apiRequestsQueue = new Queue(1, Infinity);
-  protected _positionInQueue: Record<string, number> = {};
+  protected _positionInQueue = new Map<string, number>();
   protected _updatePositionQueue = new Queue(20, Infinity);
   protected _db: DB;
 
@@ -76,8 +76,10 @@ class ChatHandler {
       } else {
         this._n_queued++;
       }
-      this._positionInQueue[this._getQueueKey(chatId, reply.message_id)] =
-        this._n_queued;
+      this._positionInQueue.set(
+        this._getQueueKey(chatId, reply.message_id),
+        this._n_queued,
+      );
 
       await this._bot.editMessageText(
         this._n_queued > 0
@@ -115,6 +117,7 @@ class ChatHandler {
 
     // Send a message to ChatGPT
     try {
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises
       const res = await this._api.sendMessage(msg, text, chatId, onProgress);
       await this._editMessage(reply, res.text);
 
@@ -138,7 +141,7 @@ class ChatHandler {
     text: string,
     needParse = true,
   ) => {
-    if (text.trim() == '' || msg.text == text) {
+    if (!text || text.trim() == '' || msg.text == text) {
       return msg;
     }
     try {
@@ -174,17 +177,23 @@ class ChatHandler {
 
   protected _updateQueue = async (chatId: number, messageId: number) => {
     // delete value for current request
-    delete this._positionInQueue[this._getQueueKey(chatId, messageId)];
-    if (this._n_queued > 0) this._n_queued--;
-    else this._n_pending--;
+    const queueKey = this._getQueueKey(chatId, messageId);
+    this._positionInQueue.delete(queueKey);
 
-    for (const key in this._positionInQueue) {
+    if (this._n_queued > 0) {
+      this._n_queued--;
+    } else {
+      this._n_pending--;
+    }
+
+    for (const [key, value] of this._positionInQueue.entries()) {
       const { chat_id, message_id } = this._parseQueueKey(key);
-      this._positionInQueue[key]--;
+      this._positionInQueue.set(key, value - 1);
       await this._updatePositionQueue.add(async () => {
+        const position = this._positionInQueue.get(key) ?? 0;
         return this._bot.editMessageText(
-          this._positionInQueue[key] > 0
-            ? `⌛: You are #${this._positionInQueue[key]} in line.`
+          position > 0
+            ? `⌛: You are #${this._positionInQueue.get(key)} in line.`
             : randomEmoji(),
           {
             chat_id,
