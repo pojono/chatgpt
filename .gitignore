@@ -3,6 +3,7 @@ node_modules
 config/local.cjs
 database
 dist
+.eslintcache
 
 prompt/*.txt
 !prompt/default.txt
