@@ -5,7 +5,7 @@ COPY yarn.lock .
 RUN yarn install
 COPY tsconfig.json .
 COPY src ./src
-RUN yarn build
+RUN yarn run build:tsc
 
 FROM node:lts-alpine
 WORKDIR /app
