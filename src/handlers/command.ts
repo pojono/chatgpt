@@ -98,10 +98,11 @@ class CommandHandler {
         await this._bot.sendChatAction(msg.chat.id, 'typing');
         // eslint-disable-next-line no-case-declarations
         const mode = firstArg ?? '';
-        if (mode in this._prompts) {
-          this._api.updateSystemMessage(this._prompts[mode]);
+        // eslint-disable-next-line no-case-declarations
+        const prompt = this._prompts[mode];
+        if (prompt) {
+          this._api.updateSystemMessage(prompt);
           await this._api.resetAllThreads();
-
           await this._bot.sendMessage(
             msg.chat.id,
             `🔄 Chat mode has been updated to "${mode}".`,

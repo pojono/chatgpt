@@ -6,7 +6,8 @@ export function removeLettersByLengthAndOffset(
   const result = [];
   for (let i = 0; i < letters.length; i++) {
     if (i < offset || i >= offset + length) {
-      result.push(letters[i]);
+      // eslint-disable-next-line @typescript-eslint/non-nullable-type-assertion-style
+      result.push(letters[i] as string);
     } else {
       result.push('');
     }

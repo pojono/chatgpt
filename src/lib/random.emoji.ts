@@ -1,6 +1,7 @@
 function getRandomElement<T>(array: T[]): T {
   const randomIndex = Math.floor(Math.random() * array.length);
-  return array[randomIndex];
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+  return array[randomIndex] as T;
 }
 
 const emojis = [
