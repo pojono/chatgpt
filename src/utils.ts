@@ -1,6 +1,5 @@
-import type { openai } from 'chatgpt';
 import config from 'config';
-import { Config, APIOfficialOptions } from './types.js';
+import { APIOfficialOptions, Config } from './types.js';
 import { tryGet } from './lib/try.get.js';
 import TelegramBot from 'node-telegram-bot-api';
 
@@ -9,9 +8,9 @@ function loadConfig(): Config {
     apiKey:
       process.env.OPENAI_API_KEY ?? config.get<string>('api.official.apiKey'),
     apiBaseUrl: tryGet<string>('api.official.apiBaseUrl'),
-    completionParams: tryGet<
-      Partial<Omit<openai.CreateChatCompletionRequest, 'messages' | 'n'>>
-    >('api.official.completionParams'),
+    completionParams: {
+      model: 'gpt-3.5-turbo-16k',
+    },
     maxModelTokens: tryGet<number>('api.official.maxModelTokens'),
     maxResponseTokens: tryGet<number>('api.official.maxResponseTokens'),
     timeoutMs: tryGet<number>('api.official.timeoutMs'),
