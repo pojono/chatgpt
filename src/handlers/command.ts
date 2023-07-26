@@ -78,7 +78,7 @@ class CommandHandler {
         await this._api.resetThread(msg.chat.id, userId);
         await this._bot.sendMessage(
           msg.chat.id,
-          '🔄 The chat thread has been reset. New chat thread started.',
+          '🔄 Контекст Вашего диалога в этом чате был сброшен.',
         );
         logWithTime(`🔄 Chat thread reset by ${userInfo}.`);
         break;
@@ -105,13 +105,13 @@ class CommandHandler {
           await this._api.resetAllThreads();
           await this._bot.sendMessage(
             msg.chat.id,
-            `🔄 Chat mode has been updated to "${mode}".`,
+            `🔄 Общение переведено в режим "${mode}" для всех пользователей во всех чатах. Контекст всех диалогов сброшен`,
           );
           logWithTime(`🔄 Chat mode has been updated to "${mode}".`);
         } else {
           await this._bot.sendMessage(
             msg.chat.id,
-            `🔄 Chat mode "${mode}" is not found.`,
+            `🔄 Режим "${mode}" не найден.`,
           );
           logWithTime(`🔄 Chat mode "${mode}" is not found.`);
         }

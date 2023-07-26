@@ -83,7 +83,7 @@ class ChatHandler {
 
       await this._bot.editMessageText(
         this._n_queued > 0
-          ? `⌛: You are #${this._n_queued} in line.`
+          ? `⌛: Пожалуйста, подождите. Перед Вами в очереди запросов: #${this._n_queued}`
           : randomEmoji(),
         {
           chat_id: chatId,
@@ -193,7 +193,9 @@ class ChatHandler {
         const position = this._positionInQueue.get(key) ?? 0;
         return this._bot.editMessageText(
           position > 0
-            ? `⌛: You are #${this._positionInQueue.get(key)} in line.`
+            ? `⌛: Пожалуйста, подождите. Перед Вами в очереди запросов: #${this._positionInQueue.get(
+                key,
+              )}`
             : randomEmoji(),
           {
             chat_id,
