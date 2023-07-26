@@ -23,7 +23,7 @@ function loadConfig(): Config {
     : tryGet<number>('bot.ownerId') ?? 0;
 
   return {
-    debug: tryGet<number>('debug') ?? 1,
+    debug: tryGet<number>('debug') ?? 2,
     version: process.env.DOCKER_TAG ?? 'local',
     bot: {
       token: process.env.TELEGRAM_BOT_TOKEN ?? config.get<string>('bot.token'),
