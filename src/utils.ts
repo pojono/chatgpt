@@ -11,8 +11,8 @@ function loadConfig(): Config {
     completionParams: {
       model: 'gpt-3.5-turbo-16k',
     },
-    maxModelTokens: tryGet<number>('api.official.maxModelTokens'),
-    maxResponseTokens: tryGet<number>('api.official.maxResponseTokens'),
+    maxModelTokens: 16000,
+    maxResponseTokens: 1000,
     timeoutMs: tryGet<number>('api.official.timeoutMs'),
     debug: (tryGet<number>('debug') ?? 1) >= 2,
   };

@@ -21,7 +21,8 @@ export class DB {
 
   getContext = (chatId: number, userId: number): Context => {
     const key = this.getKey(chatId, userId);
-    return this._db.get(key) as Context;
+    const result = this._db.get(key) as Context;
+    return result;
   };
   updateContext = async (
     chatId: number,
