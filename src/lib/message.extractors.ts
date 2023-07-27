@@ -22,3 +22,23 @@ export function extractTextByLengthAndOffset(
 ): string {
   return input.slice(offset, length + offset);
 }
+
+export function extractTextWithinSquareBrackets(input: string): string {
+  const startIndex = input.indexOf('[');
+  const endIndex = input.indexOf(']');
+
+  if (startIndex !== -1 && endIndex !== -1 && startIndex < endIndex) {
+    return input.substring(startIndex + 1, endIndex);
+  }
+  return '';
+}
+
+export function getTextAfterBracket(input: string): string {
+  if (input.startsWith('[')) {
+    const closingBracketIndex = input.indexOf(']');
+    if (closingBracketIndex !== -1) {
+      return input.substring(closingBracketIndex + 1);
+    }
+  }
+  return input;
+}

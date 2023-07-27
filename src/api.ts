@@ -8,6 +8,10 @@ import { logWithTime } from './utils.js';
 import { DB } from './db.js';
 import TelegramBot from 'node-telegram-bot-api';
 import { getUserName } from './lib/get.user.name.js';
+import {
+  extractTextWithinSquareBrackets,
+  getTextAfterBracket,
+} from './lib/message.extractors.js';
 
 const { ChatGPTAPI } = await import('chatgpt');
 
@@ -18,19 +22,36 @@ class ChatGPT {
   protected _timeoutMs: number | undefined;
   protected _db: DB;
   protected _prompt: string;
+  protected _instruction: string;
 
   constructor(apiOpts: APIOptions, db: DB, prompt: string, debug = 1) {
     this.debug = debug;
     this._opts = apiOpts;
     this._timeoutMs = undefined;
     this._db = db;
-    this._prompt = prompt;
+    this._prompt = this.getPromptWithoutInstruction(prompt);
+    this._instruction = this.getInstruction(prompt);
     this._openAI = new ChatGPTAPI(this._opts.official);
     this._timeoutMs = this._opts.official.timeoutMs;
   }
 
   init = () => {
     logWithTime('🔮 ChatGPT API has started...');
+  };
+
+  getPromptWithoutInstruction(prompt: string): string {
+    return getTextAfterBracket(prompt).trim();
+  }
+
+  getInstruction(prompt: string): string {
+    return extractTextWithinSquareBrackets(prompt).trim();
+  }
+
+  addInstructionToMessage = (message: string): string => {
+    if (this._instruction.length > 0 && Math.random() >= 0) {
+      return `{${message.trim()}} [${this._instruction}]`;
+    }
+    return `{${message.trim()}}`;
   };
 
   sendMessage = async (
@@ -50,7 +71,9 @@ class ChatGPT {
       systemMessage: this._prompt,
     };
 
-    const res: ChatResponseV4 = await this._openAI.sendMessage(text, {
+    const message = this.addInstructionToMessage(text);
+
+    const res: ChatResponseV4 = await this._openAI.sendMessage(message, {
       ...context,
       onProgress,
       timeoutMs: this._timeoutMs,
@@ -75,7 +98,8 @@ class ChatGPT {
   };
 
   updateSystemMessage = (message: string): void => {
-    this._prompt = message;
+    this._prompt = this.getPromptWithoutInstruction(message);
+    this._instruction = this.getInstruction(message);
   };
 }
 
