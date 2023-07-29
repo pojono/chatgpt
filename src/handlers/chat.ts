@@ -8,6 +8,7 @@ import { logWithTime } from '../utils.js';
 import Queue from 'promise-queue';
 import { DB } from '../db.js';
 import { randomEmoji } from '../lib/random.emoji.js';
+import { aiModeration } from '../lib/openai.js';
 
 class ChatHandler {
   debug: number;
@@ -114,6 +115,15 @@ class ChatHandler {
       ON_PROGRESS_WAIT_MS,
       { leading: true, trailing: false },
     );
+
+    const isFlagged = await aiModeration(text);
+    if (isFlagged) {
+      await this._bot.sendMessage(
+        chatId,
+        '⚠️ Sorry, I cannot answer this question because of moderation policy.',
+      );
+      return;
+    }
 
     // Send a message to ChatGPT
     try {
