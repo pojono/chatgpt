@@ -18,8 +18,10 @@ export async function aiModeration(input: string): Promise<boolean> {
     const data: CreateModerationResponse = response.data;
     const results = data.results;
     for (const result of results) {
-      const categories = result.categories;
-      const isFlagged = Object.values(categories).some((value) => value);
+      const categories = result.category_scores;
+      const isFlagged = Object.values(categories).some(
+        (value) => value >= 0.03,
+      );
       if (isFlagged) {
         return true;
       }

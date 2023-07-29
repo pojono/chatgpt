@@ -56,6 +56,15 @@ class ChatHandler {
       logWithTime(`📩 Message from ${userInfo} in ${chatInfo}:\n${text}`);
     }
 
+    const isFlagged = await aiModeration(text);
+    if (isFlagged) {
+      await this._bot.sendMessage(
+        chatId,
+        '⚠️ Sorry, I cannot answer this question because of moderation policy.',
+      );
+      return;
+    }
+
     // Send a message to the chat acknowledging receipt of their message
     const reply = await this._bot.sendMessage(
       chatId,
@@ -115,15 +124,6 @@ class ChatHandler {
       ON_PROGRESS_WAIT_MS,
       { leading: true, trailing: false },
     );
-
-    const isFlagged = await aiModeration(text);
-    if (isFlagged) {
-      await this._bot.sendMessage(
-        chatId,
-        '⚠️ Sorry, I cannot answer this question because of moderation policy.',
-      );
-      return;
-    }
 
     // Send a message to ChatGPT
     try {
