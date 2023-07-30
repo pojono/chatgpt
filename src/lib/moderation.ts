@@ -1,17 +1,17 @@
 import { CreateModerationResponse } from 'openai/api.js';
 
 const moderationScores = new Map<string, number>([
-  ['sexual', 0.3],
-  ['hate', 0.3],
-  ['harassment', 0.3],
-  ['self-harm', 0.3],
-  ['sexual/minors', 0.3],
-  ['hate/threatening', 0.3],
-  ['violence/graphic', 0.3],
-  ['self-harm/intent', 0.3],
-  ['self-harm/instructions', 0.3],
-  ['harassment/threatening', 0.3],
-  ['violence', 0.3],
+  ['sexual', 0.1],
+  ['hate', 0.1],
+  ['harassment', 0.1],
+  ['self-harm', 0.1],
+  ['sexual/minors', 0.1],
+  ['hate/threatening', 0.1],
+  ['violence/graphic', 0.1],
+  ['self-harm/intent', 0.1],
+  ['self-harm/instructions', 0.1],
+  ['harassment/threatening', 0.1],
+  ['violence', 0.1],
 ]);
 
 const isFlaggedCategory = (key: string, value: number): boolean => {
@@ -24,7 +24,11 @@ const isFlaggedCategory = (key: string, value: number): boolean => {
   return false;
 };
 
-export const isFlagged = (data: CreateModerationResponse): boolean => {
+export const isFlagged = (
+  data: CreateModerationResponse,
+): Map<string, number> => {
+  const flaggedCategories: Map<string, number> = new Map<string, number>();
+
   const results = data.results;
   for (const result of results) {
     // OpenAI updates their moderation policy frequently, so npm package interface can be outdated.
@@ -35,9 +39,9 @@ export const isFlagged = (data: CreateModerationResponse): boolean => {
     for (const [key, value] of Object.entries(categories)) {
       const isFlagged = isFlaggedCategory(key, value);
       if (isFlagged) {
-        return true;
+        flaggedCategories.set(key, value);
       }
     }
   }
-  return false;
+  return flaggedCategories;
 };

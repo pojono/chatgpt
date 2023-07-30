@@ -56,12 +56,14 @@ class ChatHandler {
       logWithTime(`📩 Message from ${userInfo} in ${chatInfo}:\n${text}`);
     }
 
-    const isFlaggedMessage = await aiModeration(text);
-    if (isFlaggedMessage) {
-      await this._bot.sendMessage(
-        chatId,
-        '⚠️ Sorry, I cannot answer this question because of moderation policy.',
-      );
+    const flaggedCategories = await aiModeration(text);
+    if (flaggedCategories.size > 0) {
+      let message =
+        '⚠️ Sorry, I cannot answer this question because of moderation policy:';
+      for (const [key, value] of flaggedCategories) {
+        message += `\n\n[${key}: ${value}]`;
+      }
+      await this._bot.sendMessage(chatId, message);
       return;
     }
 

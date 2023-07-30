@@ -10,7 +10,9 @@ const configuration = new Configuration({
 });
 const openai = new OpenAIApi(configuration);
 
-export async function aiModeration(input: string): Promise<boolean> {
+export async function aiModeration(
+  input: string,
+): Promise<Map<string, number>> {
   try {
     const response = await openai.createModeration({
       input,
@@ -18,6 +20,6 @@ export async function aiModeration(input: string): Promise<boolean> {
     return isFlagged(response.data);
   } catch (error) {
     console.error(error);
-    return false;
+    throw Error('Failed to moderate');
   }
 }
