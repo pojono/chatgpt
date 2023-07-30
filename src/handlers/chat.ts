@@ -56,8 +56,8 @@ class ChatHandler {
       logWithTime(`📩 Message from ${userInfo} in ${chatInfo}:\n${text}`);
     }
 
-    const isFlagged = await aiModeration(text);
-    if (isFlagged) {
+    const isFlaggedMessage = await aiModeration(text);
+    if (isFlaggedMessage) {
       await this._bot.sendMessage(
         chatId,
         '⚠️ Sorry, I cannot answer this question because of moderation policy.',
