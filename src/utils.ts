@@ -9,7 +9,7 @@ function loadConfig(): Config {
       process.env.OPENAI_API_KEY ?? config.get<string>('api.official.apiKey'),
     apiBaseUrl: tryGet<string>('api.official.apiBaseUrl'),
     completionParams: {
-      model: 'gpt-3.5-turbo-16k',
+      model: 'gpt-4',
     },
     maxModelTokens: 16000,
     maxResponseTokens: 1000,
