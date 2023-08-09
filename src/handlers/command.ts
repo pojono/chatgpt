@@ -4,6 +4,7 @@ import { BotOptions } from '../types.js';
 import { logWithTime } from '../utils.js';
 import { shutdown } from '../lib/shutdown.js';
 import { FileData } from '../lib/read.files.js';
+import { ChatHandler } from './chat.js';
 
 class CommandHandler {
   debug: number;
@@ -11,6 +12,7 @@ class CommandHandler {
   protected _bot: TelegramBot;
   protected _api: ChatGPT;
   protected _prompts: FileData;
+  protected _chatHandler: ChatHandler;
 
   constructor(
     bot: TelegramBot,
@@ -18,12 +20,14 @@ class CommandHandler {
     botOpts: BotOptions,
     prompts: FileData,
     debug = 1,
+    _chatHandler: ChatHandler,
   ) {
     this.debug = debug;
     this._bot = bot;
     this._api = api;
     this._opts = botOpts;
     this._prompts = prompts;
+    this._chatHandler = _chatHandler;
   }
 
   handle = async (
@@ -52,9 +56,12 @@ class CommandHandler {
 
     switch (command) {
       case '/start':
-        await this._bot.sendMessage(
-          msg.chat.id,
-          'Send me a message to start chatting! Or send /help to see more commands.',
+        await this._bot.sendChatAction(msg.chat.id, 'typing');
+        await this._api.resetThread(msg.chat.id, userId);
+        await this._chatHandler.handle(
+          msg,
+          this._api._instruction,
+          isMentioned,
         );
         break;
 

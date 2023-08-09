@@ -139,7 +139,9 @@ class ChatHandler {
       await this._db.clearContext(chatId, userId);
       await this._bot.sendMessage(
         chatId,
-        "⚠️ Sorry, I'm having trouble connecting to the server, please try again later.",
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        (err as Error).message ??
+          "⚠️ Sorry, I'm having trouble connecting to the server, please try again later.",
       );
     }
 

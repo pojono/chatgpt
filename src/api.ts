@@ -22,7 +22,7 @@ class ChatGPT {
   protected _timeoutMs: number | undefined;
   protected _db: DB;
   protected _prompt: string;
-  protected _instruction: string;
+  public _instruction: string;
 
   constructor(apiOpts: APIOptions, db: DB, prompt: string, debug = 1) {
     this.debug = debug;
@@ -48,10 +48,13 @@ class ChatGPT {
   }
 
   addInstructionToMessage = (message: string): string => {
+    return message.trim();
+    /*
     if (this._instruction.length > 0 && Math.random() >= 0) {
       return `{${message.trim()}} [${this._instruction}]`;
     }
     return `{${message.trim()}}`;
+    */
   };
 
   sendMessage = async (
