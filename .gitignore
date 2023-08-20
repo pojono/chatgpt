@@ -6,5 +6,5 @@ database
 dist
 .eslintcache
 
-prompt/*.txt
+prompt
 !prompt/default.txt
