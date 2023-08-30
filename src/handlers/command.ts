@@ -68,15 +68,28 @@ class CommandHandler {
       case '/help':
         await this._bot.sendMessage(
           msg.chat.id,
-          'To chat with me, you can:\n' +
-            '  • send messages directly (not supported in groups)\n' +
-            `  • send messages that start with ${this._opts.chatCmd}\n` +
-            '  • reply to my last message\n\n' +
-            'Command list:\n' +
-            `(When using a command in a group, make sure to include a mention after the command, like /help@${botUsername}).\n` +
-            '  • /help Show help information.\n' +
-            '  • /reset Reset the current chat thread and start a new one.\n' +
-            '  • /reload (admin required) Refresh the ChatGPT session.',
+          `
+Общение с ботом зависит от того, какие данные внесены в Google Sheet.
+https://docs.google.com/spreadsheets/d/1eroM0RfTK0YMHG6hHRoB7ubkBt_5pG9GTHTrTY7sikM/edit#gid=376591405
+
+Инструкция по заполнению таблицы:
+
+1) Нельзя менять первую строку (выделено красным)
+
+2) В первом столбце находятся названия используемых промптов, а во втором столбце - сами промпты
+
+3) Чтобы загрузить в бот данные из этой таблицы нужно отправить команду:
+/reload @${botUsername} 
+
+4) По умолчанию загружается промпт default, чтобы бот использовал другой промпт из таблицы следует отправить команду:
+/mode НАЗВАНИЕПРОМПТА @${botUsername} 
+Например:
+/mode genius @${botUsername} 
+
+5) Если отправить команду /start @${botUsername} - бот использует выбранный промпт и отправит сообщение от лица пользователя с промптом из строки start.
+
+6) Чтобы сбросить контекст Вашего диалога в данном чате нужно отправить команду:
+/reset @${botUsername}`,
         );
         break;
 
@@ -92,11 +105,14 @@ class CommandHandler {
 
       case '/mode':
         await this._bot.sendChatAction(msg.chat.id, 'typing');
+        // eslint-disable-next-line no-case-declarations
+        const text = Object.keys(this._prompts)
+          .filter((key) => key !== 'start')
+          .map((key) => `/set ${key} @${botUsername}`)
+          .join('\n');
         await this._bot.sendMessage(
           msg.chat.id,
-          Object.keys(this._prompts)
-            .map((key) => `/set ${key}`)
-            .join('\n') || 'No chat modes found.',
+          text || 'No chat modes found.',
         );
         logWithTime(`🔄 Chat modes were sent to ${userInfo}.`);
         break;
@@ -125,20 +141,10 @@ class CommandHandler {
         break;
 
       case '/reload':
-        if (msg.from?.id !== this._opts.ownerId) {
-          await this._bot.sendMessage(
-            msg.chat.id,
-            '⛔️ Sorry, you do not have the permission to run this command.',
-          );
-          logWithTime(
-            `⚠️ Permission denied for "${command}" from ${userInfo}.`,
-          );
-        } else {
-          await this._bot.sendChatAction(msg.chat.id, 'typing');
-          await this._bot.sendMessage(msg.chat.id, '🔄 Restarting...');
-          await shutdown();
-          logWithTime(`🔄 Session refreshed by ${userInfo}.`);
-        }
+        await this._bot.sendChatAction(msg.chat.id, 'typing');
+        await this._bot.sendMessage(msg.chat.id, '🔄 Restarting...');
+        await shutdown();
+        logWithTime(`🔄 Session refreshed by ${userInfo}.`);
         break;
 
       default:
