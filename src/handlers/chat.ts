@@ -64,7 +64,7 @@ class ChatHandler {
         message += `\n\n[${key}: ${value}]`;
       }
       await this._bot.sendMessage(chatId, message);
-      return;
+      // return;
     }
 
     // Send a message to the chat acknowledging receipt of their message
