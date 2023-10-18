@@ -104,6 +104,13 @@ class MessageHandler {
           );
         }
         if (entity.type == 'bot_command') {
+          console.log(
+            'entity',
+            entity.type,
+            entity.length,
+            entity.offset,
+            letters,
+          );
           letters = removeLettersByLengthAndOffset(
             letters,
             entity.length,
