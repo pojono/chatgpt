@@ -8,7 +8,7 @@ import { logWithTime } from '../utils.js';
 import Queue from 'promise-queue';
 import { DB } from '../db.js';
 import { randomEmoji } from '../lib/random.emoji.js';
-import { aiModeration } from '../lib/openai.js';
+// import { aiModeration } from '../lib/openai.js';
 
 class ChatHandler {
   debug: number;
@@ -56,6 +56,7 @@ class ChatHandler {
       logWithTime(`📩 Message from ${userInfo} in ${chatInfo}:\n${text}`);
     }
 
+    /*
     const flaggedCategories = await aiModeration(text);
     if (flaggedCategories.size > 0) {
       let message =
@@ -66,6 +67,7 @@ class ChatHandler {
       await this._bot.sendMessage(chatId, message);
       // return;
     }
+    */
 
     // Send a message to the chat acknowledging receipt of their message
     const reply = await this._bot.sendMessage(
