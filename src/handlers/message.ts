@@ -105,6 +105,17 @@ class MessageHandler {
           );
         }
         if (entity.type == 'bot_command') {
+          console.log(
+            'entity',
+            entity.type,
+            entity.length,
+            entity.offset,
+            letters,
+          );
+          // just a text, but with a slash inside
+          if (entity.offset > 0) {
+            return { text: msg.text, command: '', isMentioned: false };
+          }
           letters = removeLettersByLengthAndOffset(
             letters,
             entity.length,

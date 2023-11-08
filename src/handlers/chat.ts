@@ -38,7 +38,7 @@ class ChatHandler {
 
   handle = async (
     msg: TelegramBot.Message,
-    text: string,
+    text: string | undefined,
     isMentioned: boolean,
   ): Promise<void> => {
     if (!text) return;
