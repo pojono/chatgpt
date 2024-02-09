@@ -21,6 +21,9 @@ module.exports = {
   root: true,
   rules: {
     'prettier/prettier': 'warn',
+    '@typescript-eslint/no-unsafe-call': 'off',
+    '@typescript-eslint/no-unsafe-member-access': 'off',
+    '@typescript-eslint/no-unsafe-assignment': 'off',
   },
   ignorePatterns: ["dist/", "node_modules/"]
 };

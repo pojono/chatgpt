@@ -24,13 +24,19 @@ class ChatGPT {
   protected _prompt: string;
   public _instruction: string;
 
-  constructor(apiOpts: APIOptions, db: DB, prompt: string, debug = 1) {
+  constructor(
+    apiOpts: APIOptions,
+    db: DB,
+    prompt: string,
+    instruction: string,
+    debug = 1,
+  ) {
     this.debug = debug;
     this._opts = apiOpts;
     this._timeoutMs = undefined;
     this._db = db;
-    this._prompt = this.getPromptWithoutInstruction(prompt);
-    this._instruction = this.getInstruction(prompt);
+    this._prompt = prompt;
+    this._instruction = instruction;
     this._openAI = new ChatGPTAPI(this._opts.official);
     this._timeoutMs = this._opts.official.timeoutMs;
   }
@@ -74,7 +80,7 @@ class ChatGPT {
       systemMessage: this._prompt,
     };
 
-    const message = this.addInstructionToMessage(text);
+    const message = text;
 
     const res: ChatResponseV4 = await this._openAI.sendMessage(message, {
       ...context,
@@ -101,8 +107,7 @@ class ChatGPT {
   };
 
   updateSystemMessage = (message: string): void => {
-    this._prompt = this.getPromptWithoutInstruction(message);
-    this._instruction = this.getInstruction(message);
+    this._prompt = message;
   };
 }
 

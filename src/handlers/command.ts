@@ -34,7 +34,7 @@ class CommandHandler {
     msg: TelegramBot.Message,
     command: string,
     isMentioned: boolean,
-    botUsername: string,
+    // botUsername: string,
   ) => {
     const userId = msg.from?.id ?? 0;
     const userInfo = `@${msg.from?.username ?? ''} (${msg.from?.id})`;
@@ -48,35 +48,30 @@ class CommandHandler {
       );
     }
 
-    const commandArgs = msg.text?.split(' ');
-    const firstArg = commandArgs?.[1];
+    // const commandArgs = msg.text?.split(' ');
+    // const firstArg = commandArgs?.[1];
 
     // Ignore commands without a mention in groups.
     if (msg.chat.type != 'private' && !isMentioned) return;
 
-    switch (command) {
-      case '/start':
-        await this._bot.sendChatAction(msg.chat.id, 'typing');
-        await this._api.resetThread(msg.chat.id, userId);
-        await this._chatHandler.handle(
-          msg,
-          this._api._instruction,
-          isMentioned,
-        );
-        break;
+    if (command.startsWith('/audio') && command.length === '/audio0'.length) {
+      await this._bot.sendChatAction(msg.chat.id, 'typing');
+      await this._api.resetThread(msg.chat.id, userId);
 
+      const mode = command.slice(1);
+      const instruction = this._prompts[mode];
+      if (instruction) {
+        await this._chatHandler.handle(msg, instruction, isMentioned);
+      }
+    }
+
+    switch (command) {
       case '/help':
         await this._bot.sendMessage(
           msg.chat.id,
-          'To chat with me, you can:\n' +
-            '  • send messages directly (not supported in groups)\n' +
-            `  • send messages that start with ${this._opts.chatCmd}\n` +
-            '  • reply to my last message\n\n' +
-            'Command list:\n' +
-            `(When using a command in a group, make sure to include a mention after the command, like /help@${botUsername}).\n` +
-            '  • /help Show help information.\n' +
-            '  • /reset Reset the current chat thread and start a new one.\n' +
-            '  • /reload (admin required) Refresh the ChatGPT session.',
+          `
+Общение с ботом зависит от того, какие данные внесены в Google Sheet.
+https://docs.google.com/spreadsheets/d/1eroM0RfTK0YMHG6hHRoB7ubkBt_5pG9GTHTrTY7sikM/edit#gid=376591405`,
         );
         break;
 
@@ -90,63 +85,21 @@ class CommandHandler {
         logWithTime(`🔄 Chat thread reset by ${userInfo}.`);
         break;
 
-      case '/mode':
-        await this._bot.sendChatAction(msg.chat.id, 'typing');
-        await this._bot.sendMessage(
-          msg.chat.id,
-          Object.keys(this._prompts)
-            .map((key) => `/set ${key}`)
-            .join('\n') || 'No chat modes found.',
-        );
-        logWithTime(`🔄 Chat modes were sent to ${userInfo}.`);
-        break;
-
-      case '/set':
-        await this._bot.sendChatAction(msg.chat.id, 'typing');
-        // eslint-disable-next-line no-case-declarations
-        const mode = firstArg ?? '';
-        // eslint-disable-next-line no-case-declarations
-        const prompt = this._prompts[mode];
-        if (prompt) {
-          this._api.updateSystemMessage(prompt);
-          await this._api.resetAllThreads();
-          await this._bot.sendMessage(
-            msg.chat.id,
-            `🔄 Общение переведено в режим "${mode}" для всех пользователей во всех чатах. Контекст всех диалогов сброшен`,
-          );
-          logWithTime(`🔄 Chat mode has been updated to "${mode}".`);
-        } else {
-          await this._bot.sendMessage(
-            msg.chat.id,
-            `🔄 Режим "${mode}" не найден.`,
-          );
-          logWithTime(`🔄 Chat mode "${mode}" is not found.`);
-        }
-        break;
-
       case '/reload':
-        if (msg.from?.id !== this._opts.ownerId) {
-          await this._bot.sendMessage(
-            msg.chat.id,
-            '⛔️ Sorry, you do not have the permission to run this command.',
-          );
-          logWithTime(
-            `⚠️ Permission denied for "${command}" from ${userInfo}.`,
-          );
-        } else {
-          await this._bot.sendChatAction(msg.chat.id, 'typing');
-          await this._bot.sendMessage(msg.chat.id, '🔄 Restarting...');
-          await shutdown();
-          logWithTime(`🔄 Session refreshed by ${userInfo}.`);
-        }
+        await this._bot.sendChatAction(msg.chat.id, 'typing');
+        await this._bot.sendMessage(msg.chat.id, '🔄 Restarting...');
+        await shutdown();
+        logWithTime(`🔄 Session refreshed by ${userInfo}.`);
         break;
 
+      /*
       default:
         await this._bot.sendMessage(
           msg.chat.id,
           '⚠️ Unsupported command. Run /help to see the usage.',
         );
         break;
+      */
     }
   };
 }

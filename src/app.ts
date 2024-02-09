@@ -6,15 +6,22 @@ import { start } from './lib/start.js';
 import { getPrompts } from './lib/get.prompts.js';
 import { getDefaultPrompt } from './lib/get.default.prompt.js';
 import { DB } from './db.js';
+import { getInstruction } from './lib/get.instruction.js';
 
 async function main() {
   console.log('🔮 ChatGPT Telegram Bot is starting...');
 
-  const prompts = getPrompts();
+  const prompts = await getPrompts();
   const opts = loadConfig();
   const db = new DB();
 
-  const api = new ChatGPT(opts.api, db, getDefaultPrompt(prompts), opts.debug);
+  const api = new ChatGPT(
+    opts.api,
+    db,
+    getDefaultPrompt(prompts),
+    getInstruction(prompts),
+    opts.debug,
+  );
   api.init();
 
   const bot = new TelegramBot(opts.bot.token, {
