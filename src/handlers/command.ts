@@ -34,7 +34,7 @@ class CommandHandler {
     msg: TelegramBot.Message,
     command: string,
     isMentioned: boolean,
-    botUsername: string,
+    // botUsername: string,
   ) => {
     const userId = msg.from?.id ?? 0;
     const userInfo = `@${msg.from?.username ?? ''} (${msg.from?.id})`;
@@ -48,48 +48,30 @@ class CommandHandler {
       );
     }
 
-    const commandArgs = msg.text?.split(' ');
-    const firstArg = commandArgs?.[1];
+    // const commandArgs = msg.text?.split(' ');
+    // const firstArg = commandArgs?.[1];
 
     // Ignore commands without a mention in groups.
     if (msg.chat.type != 'private' && !isMentioned) return;
 
-    switch (command) {
-      case '/start':
-        await this._bot.sendChatAction(msg.chat.id, 'typing');
-        await this._api.resetThread(msg.chat.id, userId);
-        await this._chatHandler.handle(
-          msg,
-          this._api._instruction,
-          isMentioned,
-        );
-        break;
+    if (command.startsWith('/audio') && command.length === '/audio0'.length) {
+      await this._bot.sendChatAction(msg.chat.id, 'typing');
+      await this._api.resetThread(msg.chat.id, userId);
 
+      const mode = command.slice(1);
+      const instruction = this._prompts[mode];
+      if (instruction) {
+        await this._chatHandler.handle(msg, instruction, isMentioned);
+      }
+    }
+
+    switch (command) {
       case '/help':
         await this._bot.sendMessage(
           msg.chat.id,
           `
 Общение с ботом зависит от того, какие данные внесены в Google Sheet.
-https://docs.google.com/spreadsheets/d/1eroM0RfTK0YMHG6hHRoB7ubkBt_5pG9GTHTrTY7sikM/edit#gid=376591405
-
-Инструкция по заполнению таблицы:
-
-1) Нельзя менять первую строку (выделено красным)
-
-2) В первом столбце находятся названия используемых промптов, а во втором столбце - сами промпты
-
-3) Чтобы загрузить в бот данные из этой таблицы нужно отправить команду:
-/reload @${botUsername} 
-
-4) По умолчанию загружается промпт default, чтобы бот использовал другой промпт из таблицы следует отправить команду:
-/mode НАЗВАНИЕПРОМПТА @${botUsername} 
-Например:
-/mode genius @${botUsername} 
-
-5) Если отправить команду /start @${botUsername} - бот использует выбранный промпт и отправит сообщение от лица пользователя с промптом из строки start.
-
-6) Чтобы сбросить контекст Вашего диалога в данном чате нужно отправить команду:
-/reset @${botUsername}`,
+https://docs.google.com/spreadsheets/d/1eroM0RfTK0YMHG6hHRoB7ubkBt_5pG9GTHTrTY7sikM/edit#gid=376591405`,
         );
         break;
 
@@ -103,43 +85,6 @@ https://docs.google.com/spreadsheets/d/1eroM0RfTK0YMHG6hHRoB7ubkBt_5pG9GTHTrTY7s
         logWithTime(`🔄 Chat thread reset by ${userInfo}.`);
         break;
 
-      case '/mode':
-        await this._bot.sendChatAction(msg.chat.id, 'typing');
-        // eslint-disable-next-line no-case-declarations
-        const text = Object.keys(this._prompts)
-          .filter((key) => key !== 'start')
-          .map((key) => `/set ${key} @${botUsername}`)
-          .join('\n');
-        await this._bot.sendMessage(
-          msg.chat.id,
-          text || 'No chat modes found.',
-        );
-        logWithTime(`🔄 Chat modes were sent to ${userInfo}.`);
-        break;
-
-      case '/set':
-        await this._bot.sendChatAction(msg.chat.id, 'typing');
-        // eslint-disable-next-line no-case-declarations
-        const mode = firstArg ?? '';
-        // eslint-disable-next-line no-case-declarations
-        const prompt = this._prompts[mode];
-        if (prompt) {
-          this._api.updateSystemMessage(prompt);
-          await this._api.resetAllThreads();
-          await this._bot.sendMessage(
-            msg.chat.id,
-            `🔄 Общение переведено в режим "${mode}" для всех пользователей во всех чатах. Контекст всех диалогов сброшен`,
-          );
-          logWithTime(`🔄 Chat mode has been updated to "${mode}".`);
-        } else {
-          await this._bot.sendMessage(
-            msg.chat.id,
-            `🔄 Режим "${mode}" не найден.`,
-          );
-          logWithTime(`🔄 Chat mode "${mode}" is not found.`);
-        }
-        break;
-
       case '/reload':
         await this._bot.sendChatAction(msg.chat.id, 'typing');
         await this._bot.sendMessage(msg.chat.id, '🔄 Restarting...');
@@ -147,12 +92,14 @@ https://docs.google.com/spreadsheets/d/1eroM0RfTK0YMHG6hHRoB7ubkBt_5pG9GTHTrTY7s
         logWithTime(`🔄 Session refreshed by ${userInfo}.`);
         break;
 
+      /*
       default:
         await this._bot.sendMessage(
           msg.chat.id,
           '⚠️ Unsupported command. Run /help to see the usage.',
         );
         break;
+      */
     }
   };
 }
