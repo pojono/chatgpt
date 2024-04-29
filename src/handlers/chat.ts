@@ -65,6 +65,9 @@ class ChatHandler {
       );
       return;
     }
+    if (msg.chat.type !== 'private' && !isMentioned) {
+      return;
+    }
 
     if (text === 'Вернуться позже') {
       await this._bot.sendChatAction(msg.chat.id, 'typing');
