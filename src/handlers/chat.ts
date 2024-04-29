@@ -63,6 +63,7 @@ class ChatHandler {
         msg.chat.id,
         `Общение возможно только в личной переписке`,
       );
+      return;
     }
 
     if (text === 'Вернуться позже') {
