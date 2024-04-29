@@ -58,7 +58,7 @@ class ChatHandler {
   ): Promise<void> => {
     console.log(isMentioned);
     if (!text) return;
-    if (msg.chat.type !== 'private') {
+    if (msg.chat.type !== 'private' && isMentioned) {
       await this._bot.sendMessage(
         msg.chat.id,
         `Общение возможно только в личной переписке`,
