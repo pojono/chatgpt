@@ -36,7 +36,7 @@ class MessageHandler {
     this._api = api;
     this._opts = botOpts;
     this._authenticator = new Authenticator(bot, botOpts, debug);
-    this._chatHandler = new ChatHandler(bot, api, botOpts, db, debug);
+    this._chatHandler = new ChatHandler(bot, api, botOpts, db, debug, prompts);
     this._commandHandler = new CommandHandler(
       bot,
       api,

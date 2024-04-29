@@ -67,9 +67,18 @@ class CommandHandler {
 
     switch (command) {
       case '/start':
+        await this._bot.sendChatAction(msg.chat.id, 'typing');
         await this._bot.sendMessage(
           msg.chat.id,
           `Приветствую! Я - ваш гид в мире сна. Вместе с известным сомнологом Романом Бузуновым мы подготовили для вас серию увлекательных подкастов о физиологии сна, разрушении мифов и полезных рекомендациях. Всего доступно три подкаста. Вы готовы их послушать?`,
+          {
+            reply_markup: {
+              keyboard: [
+                [{ text: 'Включить подкаст' }],
+                [{ text: 'Вернуться позже' }],
+              ],
+            },
+          },
         );
         break;
       case '/help':
