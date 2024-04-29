@@ -81,7 +81,7 @@ class MessageHandler {
         msg,
         command,
         isMentioned,
-        this._botUsername,
+        // this._botUsername,
       );
     } else {
       // Handles:
