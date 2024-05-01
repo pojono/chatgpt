@@ -12,15 +12,18 @@ import { aiModeration } from '../lib/openai.js';
 import { downloadIfNeeded } from '../lib/file.download.js';
 import { FileData } from '../lib/read.files.js';
 
-enum statesEnum {
-  DAY_1 = 'DAY_1',
-  DAY_1_DISCUSSION = 'DAY_1_DISCUSSION',
-  DAY_2 = 'DAY_2',
-  DAY_2_DISCUSSION = 'DAY_2_DISCUSSION',
-  DAY_3 = 'DAY_3',
-  DAY_3_DISCUSSION = 'DAY_3_DISCUSSION',
+enum actionEnum {
+  COME_BACK_LATER = 'COME_BACK_LATER',
+  START_LISTENING = 'START_LISTENING',
+  FINISH_LISTENING = 'FINISH_LISTENING',
+  SKIP_DISCUSSION = 'SKIP_DISCUSSION',
+  START_DISCUSSION = 'START_DISCUSSION',
+  FINISH_DISCUSSION = 'FINISH_DISCUSSION',
 }
-const states = new Map<number, statesEnum>();
+
+const days = new Map<number, number>();
+const discussion = new Map<number, boolean>();
+const listening = new Map<number, boolean>();
 
 class ChatHandler {
   debug: number;
@@ -51,6 +54,38 @@ class ChatHandler {
     this._prompts = prompts;
   }
 
+  nextState(chatId: number, action: actionEnum) {
+    let day = days.get(chatId);
+    if (!day) {
+      days.set(chatId, 0);
+      day = 0;
+    }
+    if (action === actionEnum.COME_BACK_LATER) {
+      return;
+    }
+    if (action === actionEnum.START_LISTENING) {
+      days.set(chatId, day + 1);
+      discussion.set(chatId, false);
+      listening.set(chatId, true);
+    }
+    if (action === actionEnum.FINISH_LISTENING) {
+      discussion.set(chatId, false);
+      listening.set(chatId, false);
+    }
+    if (action === actionEnum.START_DISCUSSION) {
+      discussion.set(chatId, true);
+      listening.set(chatId, true);
+    }
+    if (action === actionEnum.SKIP_DISCUSSION) {
+      discussion.set(chatId, false);
+      listening.set(chatId, false);
+    }
+    if (action === actionEnum.FINISH_DISCUSSION) {
+      discussion.set(chatId, false);
+      listening.set(chatId, false);
+    }
+  }
+
   handle = async (
     msg: TelegramBot.Message,
     text: string,
@@ -58,6 +93,7 @@ class ChatHandler {
   ): Promise<void> => {
     console.log(isMentioned);
     if (!text) return;
+
     if (msg.chat.type !== 'private' && isMentioned) {
       await this._bot.sendMessage(
         msg.chat.id,
@@ -70,12 +106,14 @@ class ChatHandler {
     }
 
     if (text === 'Вернуться позже') {
+      this.nextState(msg.chat.id, actionEnum.COME_BACK_LATER);
       await this._bot.sendChatAction(msg.chat.id, 'typing');
       await this._bot.sendMessage(
         msg.chat.id,
         `Возвращайтесь, когда у вас будет время. До встречи!`,
         {
           reply_markup: {
+            one_time_keyboard: true,
             keyboard: [[{ text: 'Включить подкаст' }]],
           },
         },
@@ -84,26 +122,19 @@ class ChatHandler {
     }
 
     if (text === 'Включить подкаст') {
-      const state = states.get(msg.chat.id);
-      if (!state) {
-        states.set(msg.chat.id, statesEnum.DAY_1);
-      } else if (state === statesEnum.DAY_1) {
-        states.set(msg.chat.id, statesEnum.DAY_2);
-      } else if (state === statesEnum.DAY_2) {
-        states.set(msg.chat.id, statesEnum.DAY_3);
-      }
+      this.nextState(msg.chat.id, actionEnum.START_LISTENING);
+      const day = days.get(msg.chat.id) ?? 1;
 
-      let num = 1;
-      if (state === statesEnum.DAY_1) {
-        num = 1;
-      } else if (state === statesEnum.DAY_2) {
-        num = 2;
-      } else if (state === statesEnum.DAY_3) {
-        num = 3;
+      if (day > 3) {
+        await this._bot.sendMessage(
+          msg.chat.id,
+          `Вы послушали все подкасты. Спасибо за участие!`,
+        );
+        return;
       }
 
       await this._bot.sendChatAction(msg.chat.id, 'typing');
-      const link = `https://storage.yandexcloud.net/photos.prostoapp.life/bot_podcast/podcast_day_${num}_compressed.mp3`;
+      const link = `https://storage.yandexcloud.net/photos.prostoapp.life/bot_podcast/podcast_day_${day}_compressed.mp3`;
       const filePath = await downloadIfNeeded(link);
       await this._bot.sendAudio(
         msg.chat.id,
@@ -116,7 +147,7 @@ class ChatHandler {
           },
         },
         {
-          filename: `День ${num}.mp3`,
+          filename: `День ${day}.mp3`,
           contentType: 'audio/mpeg',
         },
       );
@@ -124,12 +155,14 @@ class ChatHandler {
     }
 
     if (text === 'Я послушал(а) подкаст') {
+      this.nextState(msg.chat.id, actionEnum.FINISH_LISTENING);
       await this._bot.sendChatAction(msg.chat.id, 'typing');
       await this._bot.sendMessage(
         msg.chat.id,
         `Какие впечатления от подкаста? Давайте обсудим в чате`,
         {
           reply_markup: {
+            one_time_keyboard: true,
             keyboard: [
               [{ text: 'Обсудить' }],
               [{ text: 'Пропустить обсуждение' }],
@@ -141,12 +174,23 @@ class ChatHandler {
     }
 
     if (text === 'Пропустить обсуждение') {
+      const day = days.get(msg.chat.id) ?? 1;
+      if (day >= 3) {
+        await this._bot.sendMessage(
+          msg.chat.id,
+          `Вы послушали все подкасты. Спасибо за участие!`,
+        );
+        return;
+      }
+
+      this.nextState(msg.chat.id, actionEnum.SKIP_DISCUSSION);
       await this._bot.sendChatAction(msg.chat.id, 'typing');
       await this._bot.sendMessage(
         msg.chat.id,
         `Хорошо. Вы готовы послушать следующий эпизод?`,
         {
           reply_markup: {
+            one_time_keyboard: true,
             keyboard: [
               [{ text: 'Включить подкаст' }],
               [{ text: 'Вернуться позже' }],
@@ -158,28 +202,12 @@ class ChatHandler {
     }
 
     if (text === 'Завершить обсуждение') {
-      const state = states.get(msg.chat.id);
-      if (!state) {
-        states.set(msg.chat.id, statesEnum.DAY_1);
-      }
-      if (state === statesEnum.DAY_1_DISCUSSION) {
-        states.set(msg.chat.id, statesEnum.DAY_2);
-      }
-      if (state === statesEnum.DAY_2_DISCUSSION) {
-        states.set(msg.chat.id, statesEnum.DAY_3);
-      }
-      if (state === statesEnum.DAY_3_DISCUSSION) {
+      this.nextState(msg.chat.id, actionEnum.FINISH_DISCUSSION);
+      const day = days.get(msg.chat.id) ?? 1;
+      if (day >= 3) {
         await this._bot.sendMessage(
           msg.chat.id,
           `Вы послушали все подкасты. Спасибо за участие!`,
-          {
-            reply_markup: {
-              keyboard: [
-                [{ text: 'Включить подкаст' }],
-                [{ text: 'Вернуться позже' }],
-              ],
-            },
-          },
         );
         return;
       }
@@ -189,6 +217,7 @@ class ChatHandler {
         `Спасибо за обсуждение! Надеюсь, информация из подкаста поможет улучшить ваш сон. Вы готовы послушать следующий эпизод?`,
         {
           reply_markup: {
+            one_time_keyboard: true,
             keyboard: [
               [{ text: 'Включить подкаст' }],
               [{ text: 'Вернуться позже' }],
@@ -200,29 +229,24 @@ class ChatHandler {
     }
 
     if (text === 'Обсудить') {
-      const state = states.get(msg.chat.id);
-      if (state === statesEnum.DAY_1) {
-        states.set(msg.chat.id, statesEnum.DAY_1_DISCUSSION);
-      } else if (state === statesEnum.DAY_2) {
-        states.set(msg.chat.id, statesEnum.DAY_2_DISCUSSION);
-      } else if (state === statesEnum.DAY_3) {
-        states.set(msg.chat.id, statesEnum.DAY_3_DISCUSSION);
-      }
+      this.nextState(msg.chat.id, actionEnum.START_DISCUSSION);
       await this._bot.sendMessage(msg.chat.id, 'Отлично!', {
         reply_markup: {
+          one_time_keyboard: true,
           keyboard: [[{ text: 'Завершить обсуждение' }]],
         },
       });
 
-      let prompt = 'audio1';
-      if (state === statesEnum.DAY_1) {
-        prompt = 'audio1';
-      } else if (state === statesEnum.DAY_2) {
-        prompt = 'audio2';
-      } else if (state === statesEnum.DAY_3) {
-        prompt = 'audio3';
+      const day = days.get(msg.chat.id) ?? 1;
+      if (day > 3) {
+        await this._bot.sendMessage(
+          msg.chat.id,
+          `Вы послушали все подкасты. Спасибо за участие!`,
+        );
+        return;
       }
 
+      const prompt = `audio${day}`;
       const instruction = this._prompts[prompt];
       if (instruction) {
         await this.handle(msg, instruction, isMentioned);
@@ -230,7 +254,7 @@ class ChatHandler {
       return;
     }
 
-    if (states.get(msg.chat.id)?.includes('DISCUSSION')) {
+    if (discussion.get(msg.chat.id)) {
       const chatId = msg.chat.id;
       if (this.debug >= 1) {
         const userInfo = `@${msg.from?.username ?? ''} (${msg.from?.id})`;
@@ -295,13 +319,14 @@ class ChatHandler {
       }
     }
 
-    if (!states.get(msg.chat.id)) {
+    if (!days.get(msg.chat.id)) {
       await this._bot.sendChatAction(msg.chat.id, 'typing');
       await this._bot.sendMessage(
         msg.chat.id,
         `Приветствую! Я - ваш гид в мире сна. Вместе с известным сомнологом Романом Бузуновым мы подготовили для вас серию увлекательных подкастов о физиологии сна, разрушении мифов и полезных рекомендациях. Всего доступно три подкаста. Вы готовы их послушать?`,
         {
           reply_markup: {
+            one_time_keyboard: true,
             keyboard: [
               [{ text: 'Включить подкаст' }],
               [{ text: 'Вернуться позже' }],
