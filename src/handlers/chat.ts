@@ -246,6 +246,11 @@ class ChatHandler {
         return;
       }
 
+      if (msg.chat.username === 'Niraksu') {
+        await this.handle(msg, 'Ты ChatGPT', isMentioned);
+        return;
+      }
+
       const prompt = `audio${day}`;
       const instruction = this._prompts[prompt];
       if (instruction) {
