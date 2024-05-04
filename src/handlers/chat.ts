@@ -13,6 +13,7 @@ import { downloadIfNeeded } from '../lib/file.download.js';
 import { FileData } from '../lib/read.files.js';
 
 enum actionEnum {
+  START = 'START',
   COME_BACK_LATER = 'COME_BACK_LATER',
   START_LISTENING = 'START_LISTENING',
   FINISH_LISTENING = 'FINISH_LISTENING',
@@ -60,6 +61,11 @@ class ChatHandler {
       days.set(chatId, 0);
       day = 0;
     }
+    if (action === actionEnum.START) {
+      days.delete(chatId);
+      discussion.delete(chatId);
+      listening.delete(chatId);
+    }
     if (action === actionEnum.COME_BACK_LATER) {
       return;
     }
@@ -92,6 +98,24 @@ class ChatHandler {
     isMentioned: boolean,
   ): Promise<void> => {
     console.log(isMentioned);
+
+    if (msg.text === '/start') {
+      this.nextState(msg.chat.id, actionEnum.START);
+      await this._bot.sendChatAction(msg.chat.id, 'typing');
+      await this._bot.sendMessage(
+        msg.chat.id,
+        `Приветствую! Я - ваш гид в мире сна. Вместе с известным сомнологом Романом Бузуновым мы подготовили для вас серию увлекательных подкастов о физиологии сна, разрушении мифов и полезных рекомендациях. Всего доступно три подкаста. Вы готовы их послушать?`,
+        {
+          reply_markup: {
+            one_time_keyboard: true,
+            keyboard: [
+              [{ text: 'Включить подкаст' }],
+              [{ text: 'Вернуться позже' }],
+            ],
+          },
+        },
+      );
+    }
     if (!text) return;
 
     if (msg.chat.type !== 'private' && isMentioned) {

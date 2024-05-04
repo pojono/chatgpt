@@ -74,7 +74,8 @@ class MessageHandler {
     if (!this._authenticator.authenticate(msg)) return;
 
     // Parse message.
-    const { text, command, isMentioned } = this._parseMessage(msg);
+    const { text, isMentioned } = this._parseMessage(msg);
+    /*
     if (command != '' && command != this._opts.chatCmd) {
       // For commands except `${chatCmd}`, pass the request to commandHandler.
       void this._commandHandler.handle(
@@ -83,13 +84,13 @@ class MessageHandler {
         isMentioned,
         // this._botUsername,
       );
-    } else {
-      // Handles:
-      // - direct messages in private chats
-      // - replied messages in both private chats and group chats
-      // - messages that start with `chatCmd` in private chats and group chats
-      void this._chatHandler.handle(msg, text, isMentioned);
-    }
+    } else {*/
+    // Handles:
+    // - direct messages in private chats
+    // - replied messages in both private chats and group chats
+    // - messages that start with `chatCmd` in private chats and group chats
+    void this._chatHandler.handle(msg, text, isMentioned);
+    // }
   };
 
   protected _parseMessage = (msg: TelegramBot.Message) => {
