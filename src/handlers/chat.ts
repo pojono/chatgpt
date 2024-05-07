@@ -275,7 +275,7 @@ class ChatHandler {
         return;
       }
 
-      const prompt = `audio${day}`;
+      const prompt = `podcast${day}`;
       const instruction = this._prompts[prompt];
       if (instruction) {
         await this.handle(msg, instruction, isMentioned);
