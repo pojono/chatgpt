@@ -26,6 +26,16 @@ const days = new Map<number, number>();
 const discussion = new Map<number, boolean>();
 const listening = new Map<number, boolean>();
 
+const FINISH_MESSAGE = `Вы послушали все подкасты!
+
+Будем рады узнать ваше мнение по нескольким вопросам по ссылке.
+
+👉 https://vk.cc/cwPFvY 👈
+
+Это поможет проверить ценность и полезность наших идей.
+
+Благодарим за участие и ваш фидбек! 🤍`;
+
 class ChatHandler {
   debug: number;
   protected _opts: BotOptions;
@@ -150,10 +160,7 @@ class ChatHandler {
       const day = days.get(msg.chat.id) ?? 1;
 
       if (day > 3) {
-        await this._bot.sendMessage(
-          msg.chat.id,
-          `Вы послушали все подкасты. Спасибо за участие!`,
-        );
+        await this._bot.sendMessage(msg.chat.id, FINISH_MESSAGE);
         return;
       }
 
@@ -200,10 +207,7 @@ class ChatHandler {
     if (text === 'Пропустить обсуждение') {
       const day = days.get(msg.chat.id) ?? 1;
       if (day >= 3) {
-        await this._bot.sendMessage(
-          msg.chat.id,
-          `Вы послушали все подкасты. Спасибо за участие!`,
-        );
+        await this._bot.sendMessage(msg.chat.id, FINISH_MESSAGE);
         return;
       }
 
@@ -229,10 +233,7 @@ class ChatHandler {
       this.nextState(msg.chat.id, actionEnum.FINISH_DISCUSSION);
       const day = days.get(msg.chat.id) ?? 1;
       if (day >= 3) {
-        await this._bot.sendMessage(
-          msg.chat.id,
-          `Вы послушали все подкасты. Спасибо за участие!`,
-        );
+        await this._bot.sendMessage(msg.chat.id, FINISH_MESSAGE);
         return;
       }
       await this._bot.sendChatAction(msg.chat.id, 'typing');
@@ -263,10 +264,7 @@ class ChatHandler {
 
       const day = days.get(msg.chat.id) ?? 1;
       if (day > 3) {
-        await this._bot.sendMessage(
-          msg.chat.id,
-          `Вы послушали все подкасты. Спасибо за участие!`,
-        );
+        await this._bot.sendMessage(msg.chat.id, FINISH_MESSAGE);
         return;
       }
 
