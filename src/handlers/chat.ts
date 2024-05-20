@@ -165,7 +165,7 @@ class ChatHandler {
       }
 
       await this._bot.sendChatAction(msg.chat.id, 'typing');
-      const link = `https://storage.yandexcloud.net/photos.prostoapp.life/bot_podcast/podcast_day_${day}_compressed.mp3`;
+      const link = `https://photos.prostoapp.life/bot_podcast/podcast_day_${day}_compressed.mp3`;
       const filePath = await downloadIfNeeded(link);
       await this._bot.sendAudio(
         msg.chat.id,
