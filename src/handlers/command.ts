@@ -5,6 +5,7 @@ import { logWithTime } from '../utils.js';
 import { shutdown } from '../lib/shutdown.js';
 import { FileData } from '../lib/read.files.js';
 import { ChatHandler } from './chat.js';
+import { downloadYouTubeVideo, cleanupFile } from '../lib/youtube.js';
 
 class CommandHandler {
   debug: number;
@@ -55,6 +56,44 @@ class CommandHandler {
     if (msg.chat.type != 'private' && !isMentioned) return;
 
     switch (command) {
+      case '/yt':
+        if (!firstArg) {
+          await this._bot.sendMessage(
+            msg.chat.id,
+            '❌ Please provide a URL. Usage: /yt [url]',
+          );
+          return;
+        }
+
+        try {
+          // Send processing message
+          const processingMsg = await this._bot.sendMessage(
+            msg.chat.id,
+            '🎥 Processing your request...',
+          );
+
+          // Download the video
+          const filePath = await downloadYouTubeVideo(firstArg);
+
+          // Send the video
+          await this._bot.sendAudio(msg.chat.id, filePath, {
+            caption: `🎬 Downloaded from: ${firstArg}`,
+          });
+
+          // Delete processing message
+          await this._bot.deleteMessage(msg.chat.id, processingMsg.message_id);
+
+          // Cleanup the temporary file
+          await cleanupFile(filePath);
+        } catch (error) {
+          logWithTime(`🔴 Error processing YouTube command: ${error}`);
+          await this._bot.sendMessage(
+            msg.chat.id,
+            '❌ Failed to download the video. Make sure the URL is correct and the video is not too large (max 50MB).',
+          );
+        }
+        break;
+
       case '/start':
         await this._bot.sendChatAction(msg.chat.id, 'typing');
         await this._api.resetThread(msg.chat.id, userId);

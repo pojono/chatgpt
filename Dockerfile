@@ -11,6 +11,11 @@ RUN yarn run build:tsc
 
 FROM node:lts-alpine
 WORKDIR /app
+
+# Install yt-dlp and its dependencies
+RUN apk add --no-cache python3 py3-pip ffmpeg \
+    && pip3 install --no-cache-dir yt-dlp
+
 COPY --from=builder /app/modules /app/node_modules
 COPY --from=builder /app/dist/ /app/
 COPY --from=builder /app/package.json /app/package.json
