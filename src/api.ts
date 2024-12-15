@@ -104,6 +104,44 @@ class ChatGPT {
     this._prompt = this.getPromptWithoutInstruction(message);
     this._instruction = this.getInstruction(message);
   };
+
+  protected async downloadFile(fileUrl: string): Promise<Buffer> {
+    const response = await fetch(fileUrl);
+    return Buffer.from(await response.arrayBuffer());
+  }
+
+  transcribeAudio = async (fileUrl: string): Promise<string> => {
+    try {
+      const audioData = await this.downloadFile(fileUrl);
+
+      const formData = new FormData();
+      const blob = new Blob([audioData], { type: 'audio/ogg' });
+      formData.append('file', blob, 'audio.ogg');
+      formData.append('model', 'whisper-1');
+
+      const response = await fetch(
+        'https://api.openai.com/v1/audio/transcriptions',
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${this._opts.official.apiKey}`,
+          },
+          body: formData,
+        },
+      );
+
+      if (!response.ok) {
+        throw new Error(`Transcription failed with status ${response.status}`);
+      }
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const result = await response.json();
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-return
+      return result.text;
+    } catch (error) {
+      logWithTime(`🔴 Error transcribing audio: ${error}`);
+      throw error;
+    }
+  };
 }
 
 export { ChatGPT };

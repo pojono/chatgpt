@@ -67,11 +67,23 @@ class MessageHandler {
     return false;
   };
 
-  handle = (msg: TelegramBot.Message) => {
+  handle = async (msg: TelegramBot.Message) => {
     if (this.debug >= 2) logWithTime(msg);
 
     // Authentication.
     if (!this._authenticator.authenticate(msg)) return;
+
+    // Handle audio files - only transcribe
+    if (msg.audio) {
+      await this.handleAudioFile(msg);
+      return;
+    }
+
+    // Handle voice messages - treat as regular messages
+    if (msg.voice) {
+      await this.handleVoiceMessage(msg);
+      return;
+    }
 
     // Parse message.
     const { text, command, isMentioned } = this._parseMessage(msg);
@@ -139,6 +151,106 @@ class MessageHandler {
 
     const text = letters.join('').trim();
     return { text, command, isMentioned };
+  };
+
+  protected handleAudioFile = async (msg: TelegramBot.Message) => {
+    try {
+      const chatId = msg.chat.id;
+      const fileId = msg.audio?.file_id;
+
+      if (!fileId) {
+        await this._bot.sendMessage(
+          chatId,
+          "Sorry, I couldn't process this audio file.",
+        );
+        return;
+      }
+
+      // Send a processing message
+      const processingMsg = await this._bot.sendMessage(
+        chatId,
+        '🎧 Processing your audio file...',
+      );
+
+      // Get file URL from Telegram
+      const file = await this._bot.getFile(fileId);
+      if (!file.file_path) {
+        throw new Error("Couldn't get the file path");
+      }
+
+      const fileUrl = `https://api.telegram.org/file/bot${this._opts.token}/${file.file_path}`;
+
+      // Transcribe the audio
+      const transcription = await this._api.transcribeAudio(fileUrl);
+
+      // Delete the processing message
+      await this._bot.deleteMessage(chatId, processingMsg.message_id);
+
+      // Split transcription into chunks of max 4000 characters (leaving some room for formatting)
+      const MAX_LENGTH = 4000;
+      const transcriptionChunks = transcription.match(
+        new RegExp(`.{1,${MAX_LENGTH}}(\\s|$)`, 'g'),
+      ) ?? [transcription];
+
+      // Send each chunk as a separate message
+      for (let i = 0; i < transcriptionChunks.length; i++) {
+        const chunk = transcriptionChunks[i]?.trim();
+        const prefix =
+          transcriptionChunks.length > 1
+            ? `🎙️ Transcription (part ${i + 1}/${
+                transcriptionChunks.length
+              }):\n\n`
+            : '🎙️ Transcription:\n\n';
+
+        await this._bot.sendMessage(chatId, prefix + chunk);
+      }
+    } catch (error) {
+      logWithTime(`🔴 Error handling audio file: ${error}`);
+      await this._bot.sendMessage(
+        msg.chat.id,
+        'Sorry, I encountered an error while processing your audio file.',
+      );
+    }
+  };
+
+  protected handleVoiceMessage = async (msg: TelegramBot.Message) => {
+    try {
+      const chatId = msg.chat.id;
+      const fileId = msg.voice?.file_id;
+
+      if (!fileId) {
+        await this._bot.sendMessage(
+          chatId,
+          "Sorry, I couldn't process this voice message.",
+        );
+        return;
+      }
+
+      // Get file URL from Telegram
+      const file = await this._bot.getFile(fileId);
+      if (!file.file_path) {
+        throw new Error("Couldn't get the file path");
+      }
+
+      const fileUrl = `https://api.telegram.org/file/bot${this._opts.token}/${file.file_path}`;
+
+      // Transcribe the audio
+      const transcription = await this._api.transcribeAudio(fileUrl);
+
+      console.log('Voice message transcription', transcription);
+      // Process the transcribed text as a regular message
+      await this._chatHandler.handle(
+        { ...msg, text: transcription },
+        transcription,
+        msg.chat.type === 'private',
+      );
+    } catch (error) {
+      logWithTime(`🔴 Error handling voice message: ${error}`);
+      await this._bot.sendMessage(
+        msg.chat.id,
+        'Sorry, I encountered an error while processing your voice message.',
+      );
+    }
   };
 }
 
