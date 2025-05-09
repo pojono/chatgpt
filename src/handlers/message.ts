@@ -74,7 +74,8 @@ class MessageHandler {
     if (!this._authenticator.authenticate(msg)) return;
 
     if (!msg.from?.username?.includes('nastya_mentor')) {
-      console.log('Access Denied');
+      await this._bot.sendMessage(msg.chat.id, '⚠️ Sorry, access denied.');
+      return;
     }
 
     if (msg.audio) {
