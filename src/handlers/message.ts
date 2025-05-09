@@ -73,8 +73,12 @@ class MessageHandler {
     // Authentication.
     if (!this._authenticator.authenticate(msg)) return;
 
-    // Handle audio files - only transcribe
+    if (msg.from?.username !== '@nastya_mentor') {
+      console.log('Access Denied');
+    }
+
     if (msg.audio) {
+      // Handle audio files - only transcribe
       await this.handleAudioFile(msg);
       return;
     }
