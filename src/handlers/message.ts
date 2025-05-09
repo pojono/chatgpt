@@ -73,7 +73,7 @@ class MessageHandler {
     // Authentication.
     if (!this._authenticator.authenticate(msg)) return;
 
-    if (msg.from?.username !== '@nastya_mentor') {
+    if (!msg.from?.username?.includes('nastya_mentor')) {
       console.log('Access Denied');
     }
 
