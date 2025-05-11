@@ -162,6 +162,7 @@ class ChatHandler {
     }
     try {
       text = telegramifyMarkdown(text, 'escape');
+      text = text ? text.split('**').join('') : '';
       const res = await this._bot.editMessageText(text, {
         chat_id: msg.chat.id,
         message_id: msg.message_id,
