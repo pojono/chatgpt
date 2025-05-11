@@ -132,7 +132,7 @@ class ChatHandler {
     // Send a message to ChatGPT
     try {
       // eslint-disable-next-line @typescript-eslint/no-misused-promises
-      const res = await this._api.sendMessage(msg, text, chatId, onProgress);
+      const res = await this._api.sendMessage(msg, text, chatId); //, onProgress);
       await this._editMessage(reply, res.text);
 
       if (this.debug >= 1) logWithTime(`📨 Response:\n${res.text}`);
@@ -162,7 +162,6 @@ class ChatHandler {
     }
     try {
       text = telegramifyMarkdown(text, 'escape');
-      text = text ? text.split('**').join('') : '';
       const res = await this._bot.editMessageText(text, {
         chat_id: msg.chat.id,
         message_id: msg.message_id,
