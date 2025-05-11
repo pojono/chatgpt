@@ -115,11 +115,12 @@ class ChatHandler {
     originalReply: TelegramBot.Message,
   ) => {
     const userId = msg.from?.id ?? 0;
-    let reply = originalReply;
+    const reply = originalReply;
     await this._bot.sendChatAction(chatId, 'typing');
 
     const ON_PROGRESS_WAIT_MS = 3000;
 
+    /*
     const onProgress = _.throttle(
       async (partialResponse: ChatResponseV4) => {
         reply = await this._editMessage(reply, partialResponse.text);
@@ -128,6 +129,7 @@ class ChatHandler {
       ON_PROGRESS_WAIT_MS,
       { leading: true, trailing: false },
     );
+    */
 
     // Send a message to ChatGPT
     try {
