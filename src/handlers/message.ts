@@ -73,6 +73,16 @@ class MessageHandler {
     // Authentication.
     if (!this._authenticator.authenticate(msg)) return;
 
+    if (
+      msg.from?.username?.includes('nastya_mentor') ||
+      msg.from?.username?.includes('pojono')
+    ) {
+      /* empty */
+    } else {
+      await this._bot.sendMessage(msg.chat.id, '⚠️ Sorry, access denied.');
+      return;
+    }
+
     // Handle audio files - only transcribe
     if (msg.audio) {
       await this.handleAudioFile(msg);
