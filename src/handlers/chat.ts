@@ -1,5 +1,5 @@
-import type { ChatMessage as ChatResponseV4 } from 'chatgpt';
-import _ from 'lodash';
+// import type { ChatMessage as ChatResponseV4 } from 'chatgpt';
+// import _ from 'lodash';
 import type TelegramBot from 'node-telegram-bot-api';
 import telegramifyMarkdown from 'telegramify-markdown';
 import type { ChatGPT } from '../api.js';
@@ -118,7 +118,7 @@ class ChatHandler {
     const reply = originalReply;
     await this._bot.sendChatAction(chatId, 'typing');
 
-    const ON_PROGRESS_WAIT_MS = 3000;
+    // const ON_PROGRESS_WAIT_MS = 3000;
 
     /*
     const onProgress = _.throttle(
@@ -133,10 +133,12 @@ class ChatHandler {
 
     // Send a message to ChatGPT
     try {
-      // eslint-disable-next-line @typescript-eslint/no-misused-promises
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises,@typescript-eslint/no-unsafe-assignment
       const res = await this._api.sendMessage(msg, text, chatId); //, onProgress);
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument,@typescript-eslint/no-unsafe-member-access
       await this._editMessage(reply, res.text);
 
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       if (this.debug >= 1) logWithTime(`📨 Response:\n${res.text}`);
     } catch (err) {
       logWithTime('⛔️ ChatGPT API error:', (err as Error).message);
@@ -164,6 +166,7 @@ class ChatHandler {
     }
     try {
       text = telegramifyMarkdown(text, 'escape');
+      text = text ? text.split('**').join('') : '';
       const res = await this._bot.editMessageText(text, {
         chat_id: msg.chat.id,
         message_id: msg.message_id,
