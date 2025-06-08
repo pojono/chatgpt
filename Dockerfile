@@ -14,7 +14,7 @@ WORKDIR /app
 
 # Install yt-dlp and its dependencies
 RUN apk add --no-cache python3 py3-pip ffmpeg \
-    && pip3 install --no-cache-dir yt-dlp
+    && pip3 install --break-system-packages --no-cache-dir yt-dlp
 
 COPY --from=builder /app/modules /app/node_modules
 COPY --from=builder /app/dist/ /app/
